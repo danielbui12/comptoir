@@ -8,3 +8,5 @@ target
 comptoir/node_modules
 dist/
 js/lib
+yarn.lock
+package-lock.json
