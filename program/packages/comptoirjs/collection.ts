@@ -1,6 +1,5 @@
 import * as anchor from '@project-serum/anchor';
-import { Comptoir as ComptoirDefinition, IDL } from './types/comptoir';
-import { COMPTOIR_PROGRAM_ID } from './constant';
+import { Comptoir as ComptoirDefinition } from './types/comptoir';
 import { Keypair, PublicKey, TransactionInstruction } from '@solana/web3.js';
 import {
   ASSOCIATED_TOKEN_PROGRAM_ID,
@@ -15,7 +14,7 @@ import {
 } from './getPDAs';
 import { getMetadata } from './metaplex';
 import { programs } from '@metaplex/js';
-import * as idl from './types/comptoir.json';
+import idl from './types/comptoir.json';
 import { IdlAccounts, web3 } from '@project-serum/anchor';
 import { Comptoir } from './comptoir';
 import { MetadataData } from '@metaplex/js/lib/programs/metadata';
@@ -27,7 +26,7 @@ export class Collection {
   collectionPDA: PublicKey;
   comptoir: Comptoir;
 
-  private collectionCache?: IdlAccounts<ComptoirDefinition>['collection'];
+  private collectionCache?: IdlAccounts<ComptoirDefinition>['Collection'];
 
   constructor(
     provider: anchor.Provider,
@@ -185,7 +184,7 @@ export class Collection {
     if (!this.comptoir.comptoirPDA) {
       throw new Error('comptoirPDA is not set');
     }
-    let comptoirAccount = await this.program.account.comptoir.fetch(
+    let comptoirAccount = await this.program.account.Comptoir.fetch(
       this.comptoir.comptoirPDA
     );
 
@@ -206,7 +205,7 @@ export class Collection {
 
     let sellOrders = [];
     for (let sellOrderPDA of sellOrdersPDA) {
-      let so = await this.program.account.sellOrder.fetch(sellOrderPDA);
+      let so = await this.program.account.SellOrder.fetch(sellOrderPDA);
       sellOrders.push({
         pubkey: sellOrderPDA,
         isWritable: true,
@@ -451,12 +450,12 @@ export class Collection {
   }
 
   async getCollection(): Promise<
-    IdlAccounts<ComptoirDefinition>['collection']
+    IdlAccounts<ComptoirDefinition>['Collection']
   > {
     if (this.collectionCache) {
       return this.collectionCache;
     }
-    this.collectionCache = await this.program.account.collection.fetch(
+    this.collectionCache = await this.program.account.Collection.fetch(
       this.collectionPDA
     );
     return this.collectionCache;

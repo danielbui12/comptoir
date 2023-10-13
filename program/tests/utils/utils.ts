@@ -14,12 +14,12 @@ const Transaction = programs.Transaction;
 export async function createMint(
     fee_payer: PublicKey,
     dest_owner: PublicKey,
-    lamports,
+    lamports: number,
     data: any,
     json_url: string
 ): Promise<[Keypair, PublicKey, programs.Transaction]> {
     const mint = Keypair.generate();
-    console.log(`https://solscan.io/token/${mint.publicKey.toString()}`);
+    console.log(`https://translator.shyft.to/address/${mint.publicKey.toString()}?cluster=devnet`)
     const tx_mint = new Transaction({ feePayer: fee_payer });
     let ata = await Token.getAssociatedTokenAddress(
         ASSOCIATED_TOKEN_PROGRAM_ID, // always associated token program id

@@ -1,7 +1,7 @@
 import * as anchor from '@project-serum/anchor';
 import { Comptoir as ComptoirDefinition } from './types/comptoir';
 import { COMPTOIR_PROGRAM_ID } from './constant';
-import * as idl from './types/comptoir.json';
+import idl from './types/comptoir.json';
 
 import { Keypair, PublicKey } from '@solana/web3.js';
 import { TOKEN_PROGRAM_ID } from '@solana/spl-token';
@@ -13,7 +13,7 @@ export class Comptoir {
   comptoirPDA: PublicKey | null;
   programID: PublicKey;
 
-  private comptoirCache?: IdlAccounts<ComptoirDefinition>['comptoir'];
+  private comptoirCache?: IdlAccounts<ComptoirDefinition>['Comptoir'];
 
   constructor(provider: anchor.Provider, comptoirPDA?: PublicKey, programID?: PublicKey) {
     this.programID = programID ? programID : COMPTOIR_PROGRAM_ID
@@ -86,14 +86,14 @@ export class Comptoir {
       .rpc();
   }
 
-  async getComptoir(): Promise<IdlAccounts<ComptoirDefinition>['comptoir']> {
+  async getComptoir(): Promise<IdlAccounts<ComptoirDefinition>['Comptoir']> {
     if (this.comptoirCache) {
       return this.comptoirCache;
     }
     if (!this.comptoirPDA) {
       throw new Error('comptoirPDA is not set');
     }
-    this.comptoirCache = await this.program.account.comptoir.fetch(
+    this.comptoirCache = await this.program.account.Comptoir.fetch(
       this.comptoirPDA
     );
     return this.comptoirCache;

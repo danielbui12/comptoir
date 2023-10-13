@@ -9,7 +9,7 @@ import {
 
 export const getComptoirPDA = async (owner: PublicKey, programID?: PublicKey): Promise<PublicKey> => {
   return (
-    await anchor.web3.PublicKey.findProgramAddress(
+    anchor.web3.PublicKey.findProgramAddressSync(
       [Buffer.from('COMPTOIR'), owner.toBuffer()],
       programID ? programID : COMPTOIR_PROGRAM_ID
     )
@@ -22,7 +22,7 @@ export const getEscrowPDA = async (
   programID?: PublicKey
 ): Promise<PublicKey> => {
   return (
-    await anchor.web3.PublicKey.findProgramAddress(
+    anchor.web3.PublicKey.findProgramAddressSync(
       [
         Buffer.from('COMPTOIR'),
         comptoirPDA.toBuffer(),
@@ -40,7 +40,7 @@ export const getCollectionPDA = async (
   programID?: PublicKey
 ): Promise<PublicKey> => {
   return (
-    await anchor.web3.PublicKey.findProgramAddress(
+    anchor.web3.PublicKey.findProgramAddressSync(
       [Buffer.from('COMPTOIR'), Buffer.from(name), comptoirPDA.toBuffer()],
         programID ? programID : COMPTOIR_PROGRAM_ID
     )
@@ -52,7 +52,7 @@ export const getNftVaultPDA = async (
   programID?: PublicKey
 ): Promise<PublicKey> => {
   return (
-    await anchor.web3.PublicKey.findProgramAddress(
+    anchor.web3.PublicKey.findProgramAddressSync(
       [Buffer.from('COMPTOIR'), Buffer.from('vault'), nftMint.toBuffer()],
         programID ? programID : COMPTOIR_PROGRAM_ID
     )
@@ -65,7 +65,7 @@ export const getSellOrderPDA = async (
   programID?: PublicKey
 ): Promise<PublicKey> => {
   return (
-    await anchor.web3.PublicKey.findProgramAddress(
+    anchor.web3.PublicKey.findProgramAddressSync(
       [
         Buffer.from('COMPTOIR'),
         sellerTokenAccount.toBuffer(),
@@ -96,7 +96,7 @@ export const getBuyOfferPDA = async (
   programID?: PublicKey
 ): Promise<PublicKey> => {
   return (
-    await anchor.web3.PublicKey.findProgramAddress(
+    anchor.web3.PublicKey.findProgramAddressSync(
       [
         Buffer.from('COMPTOIR'),
         comptoirPDA.toBuffer(),

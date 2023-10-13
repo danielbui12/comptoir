@@ -673,7 +673,7 @@ export type Comptoir = {
   ],
   "accounts": [
     {
-      "name": "comptoir",
+      "name": "Comptoir",
       "type": {
         "kind": "struct",
         "fields": [
@@ -697,7 +697,7 @@ export type Comptoir = {
       }
     },
     {
-      "name": "sellOrder",
+      "name": "SellOrder",
       "type": {
         "kind": "struct",
         "fields": [
@@ -729,7 +729,7 @@ export type Comptoir = {
       }
     },
     {
-      "name": "collection",
+      "name": "Collection",
       "type": {
         "kind": "struct",
         "fields": [
@@ -763,7 +763,7 @@ export type Comptoir = {
       }
     },
     {
-      "name": "buyOffer",
+      "name": "BuyOffer",
       "type": {
         "kind": "struct",
         "fields": [
@@ -1527,7 +1527,7 @@ export const IDL: Comptoir = {
   ],
   "accounts": [
     {
-      "name": "comptoir",
+      "name": "Comptoir",
       "type": {
         "kind": "struct",
         "fields": [
@@ -1551,7 +1551,7 @@ export const IDL: Comptoir = {
       }
     },
     {
-      "name": "sellOrder",
+      "name": "SellOrder",
       "type": {
         "kind": "struct",
         "fields": [
@@ -1583,7 +1583,7 @@ export const IDL: Comptoir = {
       }
     },
     {
-      "name": "collection",
+      "name": "Collection",
       "type": {
         "kind": "struct",
         "fields": [
@@ -1617,7 +1617,7 @@ export const IDL: Comptoir = {
       }
     },
     {
-      "name": "buyOffer",
+      "name": "BuyOffer",
       "type": {
         "kind": "struct",
         "fields": [

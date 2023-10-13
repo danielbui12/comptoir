@@ -13,7 +13,7 @@ use anchor_spl::associated_token::AssociatedToken;
 use metaplex_token_metadata::utils::{assert_derivation};
 use crate::{constant::*, event::*, error::*, transfer::*};
 
-declare_id!("FCoMPzD3cihsM7EBSbXtorF2yHL4jJ6vrbWtdVaN7qZc");
+declare_id!("EZxFrEd1TBL6A1zzSvcasnR7RyEwRqkLmBjvLsSCaKNc");
 
 #[program]
 pub mod comptoir {

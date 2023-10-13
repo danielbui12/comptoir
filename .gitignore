@@ -10,3 +10,6 @@ dist/
 js/lib
 yarn.lock
 package-lock.json
+wallet-keypair.json
+yarn-*.log
+test-ledger
