@@ -1,4 +1,3 @@
-import * as anchor from '@project-serum/anchor';
 import { COMPTOIR_PROGRAM_ID } from './constant';
 import { PublicKey } from '@solana/web3.js';
 import {
@@ -6,10 +5,14 @@ import {
   TOKEN_PROGRAM_ID,
   getAssociatedTokenAddressSync,
 } from '@solana/spl-token';
+import { BN } from '@project-serum/anchor';
+import {
+  PROGRAM_ID as TOKEN_METADATA_PROGRAM_ID,
+} from "@metaplex-foundation/mpl-token-metadata";
 
 export const getComptoirPDA = (owner: PublicKey, programID?: PublicKey): PublicKey => {
   return (
-    anchor.web3.PublicKey.findProgramAddressSync(
+    PublicKey.findProgramAddressSync(
       [Buffer.from('COMPTOIR'), owner.toBuffer()],
       programID ? programID : COMPTOIR_PROGRAM_ID
     )
@@ -22,7 +25,7 @@ export const getEscrowPDA = (
   programID?: PublicKey
 ): PublicKey => {
   return (
-    anchor.web3.PublicKey.findProgramAddressSync(
+    PublicKey.findProgramAddressSync(
       [
         Buffer.from('COMPTOIR'),
         comptoirPDA.toBuffer(),
@@ -40,7 +43,7 @@ export const getCollectionPDA = (
   programID?: PublicKey
 ): PublicKey => {
   return (
-    anchor.web3.PublicKey.findProgramAddressSync(
+    PublicKey.findProgramAddressSync(
       [Buffer.from('COMPTOIR'), Buffer.from(name), comptoirPDA.toBuffer()],
         programID ? programID : COMPTOIR_PROGRAM_ID
     )
@@ -52,7 +55,7 @@ export const getNftVaultPDA = (
   programID?: PublicKey
 ): PublicKey => {
   return (
-    anchor.web3.PublicKey.findProgramAddressSync(
+    PublicKey.findProgramAddressSync(
       [Buffer.from('COMPTOIR'), Buffer.from('vault'), nftMint.toBuffer()],
         programID ? programID : COMPTOIR_PROGRAM_ID
     )
@@ -61,11 +64,11 @@ export const getNftVaultPDA = (
 
 export const getSellOrderPDA = (
   sellerTokenAccount: PublicKey,
-  price: anchor.BN,
+  price: BN,
   programID?: PublicKey
 ): PublicKey => {
   return (
-    anchor.web3.PublicKey.findProgramAddressSync(
+    PublicKey.findProgramAddressSync(
       [
         Buffer.from('COMPTOIR'),
         sellerTokenAccount.toBuffer(),
@@ -92,11 +95,11 @@ export const getBuyOfferPDA = (
   comptoirPDA: PublicKey,
   buyer: PublicKey,
   mint: PublicKey,
-  price: anchor.BN,
+  price: BN,
   programID?: PublicKey
 ): PublicKey => {
   return (
-    anchor.web3.PublicKey.findProgramAddressSync(
+    PublicKey.findProgramAddressSync(
       [
         Buffer.from('COMPTOIR'),
         comptoirPDA.toBuffer(),
@@ -109,3 +112,22 @@ export const getBuyOfferPDA = (
     )
   )[0];
 };
+
+export const getMetadataPDA = (mint: PublicKey): PublicKey => {
+  return PublicKey.findProgramAddressSync(
+    [Buffer.from("metadata", "utf8"), TOKEN_METADATA_PROGRAM_ID.toBuffer(), mint.toBuffer()],
+    TOKEN_METADATA_PROGRAM_ID,
+  )[0];
+}
+
+export const getMasterEditionPDA = (mint: PublicKey): PublicKey => {
+  return PublicKey.findProgramAddressSync(
+    [
+      Buffer.from("metadata", "utf8"),
+      TOKEN_METADATA_PROGRAM_ID.toBuffer(),
+      mint.toBuffer(),
+      Buffer.from("edition", "utf8"),
+    ],
+    TOKEN_METADATA_PROGRAM_ID,
+  )[0];
+}

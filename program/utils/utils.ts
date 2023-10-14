@@ -7,7 +7,8 @@ import {
   createCreateMasterEditionV3Instruction,
   createSetCollectionSizeInstruction,
 } from "@metaplex-foundation/mpl-token-metadata";
-import { confirmTx, explorerURL, extractSignatureFromFailedTransaction } from "./helper";
+import { explorerURL, extractSignatureFromFailedTransaction } from "./helper";
+import { getMasterEditionPDA, getMetadataPDA } from "../packages/comptoirjs";
 
 /**
  * Create an NFT collection on-chain, using the regular Metaplex standards
@@ -57,13 +58,10 @@ export async function mintNFT(
     undefined,
     TOKEN_PROGRAM_ID,
   );
-  // console.log(explorerURL({ txSignature: mintSig }));
+  console.log(explorerURL({ txSignature: mintSig }));
 
   // derive the PDA for the metadata account
-  const [metadataAccount, _bump] = PublicKey.findProgramAddressSync(
-    [Buffer.from("metadata", "utf8"), TOKEN_METADATA_PROGRAM_ID.toBuffer(), mint.toBuffer()],
-    TOKEN_METADATA_PROGRAM_ID,
-  );
+  const metadataAccount = getMetadataPDA(mint);
   console.log("Metadata account:", metadataAccount.toBase58());
 
   // create an instruction to create the metadata account
@@ -81,15 +79,7 @@ export async function mintNFT(
   );
 
   // derive the PDA for the metadata account
-  const [masterEditionAccount, _bump2] = PublicKey.findProgramAddressSync(
-    [
-      Buffer.from("metadata", "utf8"),
-      TOKEN_METADATA_PROGRAM_ID.toBuffer(),
-      mint.toBuffer(),
-      Buffer.from("edition", "utf8"),
-    ],
-    TOKEN_METADATA_PROGRAM_ID,
-  );
+  const masterEditionAccount = getMasterEditionPDA(mint);
   console.log("Master edition account:", masterEditionAccount.toBase58());
 
   // create an instruction to create the metadata account

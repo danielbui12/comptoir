@@ -3,14 +3,14 @@ seeds = false
 skip-lint = false
 
 [programs.localnet]
-comptoir = "EZxFrEd1TBL6A1zzSvcasnR7RyEwRqkLmBjvLsSCaKNc"
+comptoir = "BDrVozxqgonijgLa7CWAv3cRT4gN577WJppa65PWeYJo"
 
 [programs.devnet]
-comptoir = "EZxFrEd1TBL6A1zzSvcasnR7RyEwRqkLmBjvLsSCaKNc"
+comptoir = "BDrVozxqgonijgLa7CWAv3cRT4gN577WJppa65PWeYJo"
 
 [registry]
-url = "https://anchor.projectserum.com"
-# url = "http://127.0.0.1:8899"
+# url = "https://anchor.projectserum.com"
+url = "http://127.0.0.1:8899"
 
 [provider]
 # cluster = "localnet"
@@ -23,5 +23,5 @@ client = "yarn run ts-node client/*.ts"
 example-wf = "yarn run ts-node packages/comptoirjs/examples/complete_workflow.ts"
 
 [[test.genesis]]
-address = "EZxFrEd1TBL6A1zzSvcasnR7RyEwRqkLmBjvLsSCaKNc"
+address = "BDrVozxqgonijgLa7CWAv3cRT4gN577WJppa65PWeYJo"
 program = "./deps/metadata.so"

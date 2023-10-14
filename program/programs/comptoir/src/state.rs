@@ -2,37 +2,37 @@ use anchor_lang::prelude::*;
 
 #[account]
 pub struct Comptoir {
-    fees: u16,
-    fees_destination: Pubkey,
-    authority: Pubkey,
-    mint: Pubkey,
+    pub fees: u16,
+    pub fees_destination: Pubkey,
+    pub authority: Pubkey,
+    pub mint: Pubkey,
 }
 
 #[account]
 pub struct SellOrder {
-    comptoir: Pubkey,
-    price: u64,
-    quantity: u64,
-    mint: Pubkey,
-    authority: Pubkey,
-    destination: Pubkey,
+    pub comptoir: Pubkey,
+    pub price: u64,
+    pub quantity: u64,
+    pub mint: Pubkey,
+    pub authority: Pubkey,
+    pub destination: Pubkey,
 }
 
 #[account]
 pub struct Collection {
-    comptoir_key: Pubkey,
-    name: String,
-    symbol: String,
-    required_verifier: Pubkey,
-    fees: Option<u16>, //Takes priority over comptoir fees
-    ignore_creator_fee: bool,
+    pub comptoir_key: Pubkey,
+    pub name: String,
+    pub symbol: String,
+    pub required_verifier: Pubkey,
+    pub fees: Option<u16>, //Takes priority over comptoir fees
+    pub ignore_creator_fee: bool,
 }
 
 #[account]
 pub struct BuyOffer {
-    comptoir: Pubkey,
-    mint: Pubkey,
-    proposed_price: u64,
-    authority: Pubkey,
-    destination: Pubkey,
+    pub comptoir: Pubkey,
+    pub mint: Pubkey,
+    pub proposed_price: u64,
+    pub authority: Pubkey,
+    pub destination: Pubkey,
 }

@@ -9,10 +9,11 @@ import {
   getAssociatedTokenAddress,
   getBuyOfferPDA,
   getEscrowPDA,
+  getMetadataPDA,
   getNftVaultPDA,
   getSellOrderPDA,
 } from './getPDAs';
-import { getMetadata, getMetadataPDA } from './metaplex';
+import { getMetadata } from './metaplex';
 import idl from './types/comptoir.json';
 import { IdlAccounts, web3 } from '@project-serum/anchor';
 import { Comptoir } from './comptoir';
@@ -25,7 +26,7 @@ export class Collection {
   comptoir: Comptoir;
   provider: anchor.Provider;
 
-  private collectionCache?: IdlAccounts<ComptoirDefinition>['Collection'];
+  private collectionCache?: IdlAccounts<ComptoirDefinition>['collection'];
 
   constructor(
     provider: anchor.Provider,
@@ -34,6 +35,7 @@ export class Collection {
   ) {
     this.comptoir = comptoir;
     this.program = new anchor.Program(
+      // @ts-ignore
       idl as ComptoirDefinition,
       comptoir.programID,
       provider
@@ -56,7 +58,7 @@ export class Collection {
 
     const programNftVaultPDA = getNftVaultPDA(nftMint, this.comptoir.programID);
     const sellOrderPDA = getSellOrderPDA(sellerNftAccount, price, this.comptoir.programID);
-    const metadataPDA = getMetadataPDA(this.provider.connection, nftMint);
+    const metadataPDA = getMetadataPDA(nftMint);
 
     return await this.program.methods
       .createSellOrder(price, amount, sellerDestination)
@@ -184,7 +186,7 @@ export class Collection {
     if (!this.comptoir.comptoirPDA) {
       throw new Error('comptoirPDA is not set');
     }
-    let comptoirAccount = await this.program.account.Comptoir.fetch(
+    let comptoirAccount = await this.program.account.comptoir.fetch(
       this.comptoir.comptoirPDA
     );
 
@@ -205,7 +207,7 @@ export class Collection {
 
     let sellOrders = [];
     for (let sellOrderPDA of sellOrdersPDA) {
-      let so = await this.program.account.SellOrder.fetch(sellOrderPDA);
+      let so = await this.program.account.sellOrder.fetch(sellOrderPDA);
       sellOrders.push({
         pubkey: sellOrderPDA,
         isWritable: true,
@@ -285,7 +287,7 @@ export class Collection {
       this.comptoir.programID
     );
 
-    const metadataPDA = getMetadataPDA(this.provider.connection, nftMintToBuy);
+    const metadataPDA = getMetadataPDA(nftMintToBuy);
 
     return await this.program.methods
       .createBuyOffer(offerPrice)
@@ -417,7 +419,7 @@ export class Collection {
         destination: buyerNftTokenAccount,
         sellerNftAccount: sellerNftTokenAccount,
         buyOffer: buyOfferPDA,
-        metadata: getMetadataPDA(this.provider.connection, nftMint),
+        metadata: getMetadataPDA(nftMint),
         systemProgram: anchor.web3.SystemProgram.programId,
         tokenProgram: TOKEN_PROGRAM_ID,
         rent: anchor.web3.SYSVAR_RENT_PUBKEY,
@@ -448,12 +450,12 @@ export class Collection {
   }
 
   async getCollection(): Promise<
-    IdlAccounts<ComptoirDefinition>['Collection']
+    IdlAccounts<ComptoirDefinition>['collection']
   > {
     if (this.collectionCache) {
       return this.collectionCache;
     }
-    this.collectionCache = await this.program.account.Collection.fetch(
+    this.collectionCache = await this.program.account.collection.fetch(
       this.collectionPDA
     );
     return this.collectionCache;

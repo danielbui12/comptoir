@@ -12,7 +12,7 @@ export class Comptoir {
   comptoirPDA: PublicKey | null;
   programID: PublicKey;
 
-  private comptoirCache?: IdlAccounts<ComptoirDefinition>['Comptoir'];
+  private comptoirCache?: IdlAccounts<ComptoirDefinition>['comptoir'];
 
   constructor(provider: anchor.Provider, comptoirPDA?: PublicKey, programID?: PublicKey) {
     this.programID = programID ? programID : COMPTOIR_PROGRAM_ID
@@ -84,14 +84,14 @@ export class Comptoir {
       .rpc();
   }
 
-  async getComptoir(): Promise<IdlAccounts<ComptoirDefinition>['Comptoir']> {
+  async getComptoir(): Promise<IdlAccounts<ComptoirDefinition>['comptoir']> {
     if (this.comptoirCache) {
       return this.comptoirCache;
     }
     if (!this.comptoirPDA) {
       throw new Error('comptoirPDA is not set');
     }
-    this.comptoirCache = await this.program.account.Comptoir.fetch(
+    this.comptoirCache = await this.program.account.comptoir.fetch(
       this.comptoirPDA
     );
     return this.comptoirCache;

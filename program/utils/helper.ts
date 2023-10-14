@@ -1,7 +1,6 @@
 import { CreateMetadataAccountArgsV3 } from "@metaplex-foundation/mpl-token-metadata";
 import { Connection, Keypair, PublicKey } from "@solana/web3.js";
 import fs from 'fs';
-import path from 'path';
 
 /*
   Compute the Solana explorer address for the various data

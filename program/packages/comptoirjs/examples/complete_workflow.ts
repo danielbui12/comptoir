@@ -1,7 +1,7 @@
 import * as anchor from '@project-serum/anchor'
 import { Comptoir } from '../comptoir'
 import { PublicKey } from '@solana/web3.js'
-import { getAssociatedTokenAddress, getCollectionPDA, getComptoirPDA, getSellOrderPDA } from '../getPDAs'
+import { getAssociatedTokenAddress, getCollectionPDA, getComptoirPDA, getMasterEditionPDA, getMetadataPDA, getSellOrderPDA } from '../getPDAs'
 import { loadKeypairFromFile, nft_data } from '../../../utils/helper'
 import { mintNFT } from '../../../utils/utils'
 import * as splToken from '@solana/spl-token'
@@ -22,17 +22,17 @@ async function workflow(comptoirMint: PublicKey, nftMint: PublicKey) {
     comptoirPDA
   )
   
-  console.log('Creating comptoir...')
-  await comptoir.createComptoir(
-    payer,
-    comptoirMint,
-    5,
-    getAssociatedTokenAddress(
-      payer.publicKey,
-      comptoirMint,
-    )
-  )
-  console.log('Created comptoir')
+  // console.log('Creating comptoir...')
+  // await comptoir.createComptoir(
+  //   payer,
+  //   comptoirMint,
+  //   5,
+  //   getAssociatedTokenAddress(
+  //     payer.publicKey,
+  //     comptoirMint,
+  //   )
+  // )
+  // console.log('Created comptoir')
 
   // console.log('Creating collection...')
   // await comptoir.createCollection(
@@ -45,38 +45,36 @@ async function workflow(comptoirMint: PublicKey, nftMint: PublicKey) {
   // )
   // console.log('Created collection')
 
+  let collectionPDA = getCollectionPDA(comptoir.comptoirPDA as PublicKey, 'AURY')
+  let userNftAccount = getAssociatedTokenAddress(payer.publicKey, nftMint)
+  let userTokenAccount = getAssociatedTokenAddress(payer.publicKey, comptoirMint)
 
-  // let collectionPDA = getCollectionPDA(comptoir.comptoirPDA as PublicKey, 'AURY')
-  // let userNftAccount = getAssociatedTokenAddress(payer.publicKey, nftMint)
-  // let userTokenAccount = getAssociatedTokenAddress(payer.publicKey, comptoirMint)
+  let collection = new Collection(provider, collectionPDA, comptoir)
 
-  // let collection = new Collection(provider, collectionPDA, comptoir)
+  let sellPrice = new anchor.BN(1000)
+  let sellQuantity = new anchor.BN(1)
+  console.log('Selling asset...')
+  await collection.sellAsset(
+    nftMint,
+    userNftAccount,
+    userTokenAccount,
+    sellPrice,
+    sellQuantity,
+    payer
+  )
+  console.log('Created asset')
 
-  // let sellPrice = new anchor.BN(1000)
-  // let sellQuantity = new anchor.BN(1)
-
-  // console.log('Selling asset...')
-  // await collection.sellAsset(
-  //   nftMint,
-  //   userNftAccount,
-  //   userTokenAccount,
-  //   sellPrice,
-  //   sellQuantity,
-  //   payer
-  // )
-  // console.log('Created asset')
-
-  // console.log('Buying asset...')
-  // //We buy our own asset just for demonstration
-  // await collection.buy(
-  //   nftMint,
-  //   [getSellOrderPDA(userNftAccount, sellPrice)],
-  //   userNftAccount,
-  //   userTokenAccount,
-  //   sellQuantity,
-  //   payer
-  // )
-  // console.log('Bought')
+  console.log('Buying asset...')
+  //We buy our own asset just for demonstration
+  await collection.buy(
+    nftMint,
+    [getSellOrderPDA(userNftAccount, sellPrice)],
+    userNftAccount,
+    userTokenAccount,
+    sellQuantity,
+    payer
+  )
+  console.log('Bought')
 }
 
 async function mintMeNft(): Promise<PublicKey> {
@@ -86,20 +84,12 @@ async function mintMeNft(): Promise<PublicKey> {
     connection,
     payer,
     metadata,
-  );
-
+  );  
   return mint
 }
 
-async function setup() {
-  // let fromAirdropSignature = await provider.connection.requestAirdrop(
-  //   payer.publicKey,
-  //   5 * anchor.web3.LAMPORTS_PER_SOL,
-  // )
-  // await confirmTx(provider.connection, fromAirdropSignature);
-
-  let nftMint: PublicKey = await mintMeNft()
-  let comptoirMint = await splToken.createMint(
+async function mintMeFt(): Promise<PublicKey> {
+  const comptoirMint = await splToken.createMint(
     connection,
     payer,
     payer.publicKey,
@@ -113,17 +103,29 @@ async function setup() {
     comptoirMint,
     payer.publicKey,
   )
-  
+
   await splToken.mintTo(connection, payer, comptoirMint, ata.address, payer, 1000)
+  return comptoirMint;
+}
+
+async function setup() {
+  // let fromAirdropSignature = await provider.connection.requestAirdrop(
+  //   payer.publicKey,
+  //   5 * anchor.web3.LAMPORTS_PER_SOL,
+  // )
+  // await confirmTx(provider.connection, fromAirdropSignature);
+
+  const nftMint = await mintMeNft()
+  const comptoirMint = await mintMeFt();
  
   return [comptoirMint, nftMint]
 }
 
 (async () => {
-  // let [comptoirMint, nftMint] = await setup()
+  // const [comptoirMint, nftMint] = await setup()
 
   await workflow(
-    new PublicKey('HkrHYg2TECHYdk8bpvwHGVUN8RygxUyrLCwKxEhkotrk'),
-    new PublicKey('DMjdQQJsTdQfcL7dJ9ozYXMrL37KS3bAPeww2LU1sUyn')
+    new PublicKey('5RxDxvHJej8Q1tmuPvWnoHWNdyKkR3aEQPLXYgv989G2'),
+    new PublicKey('J11F2uLJTdV3UZAWoHvRBfakx3RpNnzTTG6UDk3SFgm7'),
   )
 })()
