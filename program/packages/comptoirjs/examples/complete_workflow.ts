@@ -2,119 +2,128 @@ import * as anchor from '@project-serum/anchor'
 import { Comptoir } from '../comptoir'
 import { PublicKey } from '@solana/web3.js'
 import { getAssociatedTokenAddress, getCollectionPDA, getComptoirPDA, getSellOrderPDA } from '../getPDAs'
-import { Token } from '@solana/spl-token'
-import { nft_data, nft_json_url } from '../../../tests/data'
-import { createMint } from '../../../tests/utils/utils'
+import { loadKeypairFromFile, nft_data } from '../../../utils/helper'
+import { mintNFT } from '../../../utils/utils'
 import * as splToken from '@solana/spl-token'
 import { Collection } from '../collection'
+import { WrapperConnection } from '../../../utils/wrapperConnection'
 
-let provider = anchor.AnchorProvider.local('http://127.0.0.1:8899', { commitment: 'confirmed' })
-anchor.setProvider(provider)
+const connection = new WrapperConnection("https://api.devnet.solana.com", 'finalized');
+const payer = loadKeypairFromFile("/home/daniel/.config/solana/id.json")
+const provider = new anchor.AnchorProvider(connection, new anchor.Wallet(payer), {})
 
 async function workflow(comptoirMint: PublicKey, nftMint: PublicKey) {
-  let comptoirPDA = await getComptoirPDA(
-    anchor.Wallet.local().payer.publicKey
+  let comptoirPDA = getComptoirPDA(
+    payer.publicKey
   )
-  let comptoir = new Comptoir(provider, comptoirPDA)
-
+  console.info('comptoirPDA', comptoirPDA.toString());
+  let comptoir = new Comptoir(
+    provider,
+    comptoirPDA
+  )
+  
+  console.log('Creating comptoir...')
   await comptoir.createComptoir(
-    anchor.Wallet.local().payer,
+    payer,
     comptoirMint,
     5,
-    await getAssociatedTokenAddress(
-      anchor.Wallet.local().payer.publicKey,
+    getAssociatedTokenAddress(
+      payer.publicKey,
       comptoirMint,
     )
   )
+  console.log('Created comptoir')
 
-  await comptoir.createCollection(
-    anchor.Wallet.local().payer,
-    'aurorian',
-    anchor.Wallet.local().payer.publicKey,
-    'AURY',
-    true,
-    2,
-  )
-
-
-  let collectionPDA = await getCollectionPDA(comptoir.comptoirPDA as PublicKey, 'AURY')
-  let userNftAccount = await getAssociatedTokenAddress(anchor.Wallet.local().payer.publicKey, nftMint)
-  let userTokenAccount = await getAssociatedTokenAddress(anchor.Wallet.local().payer.publicKey, comptoirMint)
-
-  let collection = new Collection(provider, collectionPDA, comptoir)
-
-  let sellPrice = new anchor.BN(1000)
-  let sellQuantity = new anchor.BN(1)
+  // console.log('Creating collection...')
+  // await comptoir.createCollection(
+  //   payer,
+  //   'aurorian',
+  //   payer.publicKey,
+  //   'AURY',
+  //   true,
+  //   2,
+  // )
+  // console.log('Created collection')
 
 
-  await collection.sellAsset(
-    nftMint,
-    userNftAccount,
-    userTokenAccount,
-    sellPrice,
-    sellQuantity,
-    anchor.Wallet.local().payer
-  )
+  // let collectionPDA = getCollectionPDA(comptoir.comptoirPDA as PublicKey, 'AURY')
+  // let userNftAccount = getAssociatedTokenAddress(payer.publicKey, nftMint)
+  // let userTokenAccount = getAssociatedTokenAddress(payer.publicKey, comptoirMint)
 
-  //We buy our own asset just for demonstration
-  await collection.buy(
-    nftMint,
-    [await getSellOrderPDA(userNftAccount, sellPrice)],
-    userNftAccount,
-    userTokenAccount,
-    sellQuantity,
-    anchor.Wallet.local().payer
-  )
+  // let collection = new Collection(provider, collectionPDA, comptoir)
+
+  // let sellPrice = new anchor.BN(1000)
+  // let sellQuantity = new anchor.BN(1)
+
+  // console.log('Selling asset...')
+  // await collection.sellAsset(
+  //   nftMint,
+  //   userNftAccount,
+  //   userTokenAccount,
+  //   sellPrice,
+  //   sellQuantity,
+  //   payer
+  // )
+  // console.log('Created asset')
+
+  // console.log('Buying asset...')
+  // //We buy our own asset just for demonstration
+  // await collection.buy(
+  //   nftMint,
+  //   [getSellOrderPDA(userNftAccount, sellPrice)],
+  //   userNftAccount,
+  //   userTokenAccount,
+  //   sellQuantity,
+  //   payer
+  // )
+  // console.log('Bought')
 }
 
 async function mintMeNft(): Promise<PublicKey> {
-  const data = nft_data(anchor.Wallet.local().payer.publicKey)
-  const json_url = nft_json_url
-  const lamports = await Token.getMinBalanceRentForExemptMint(
-    provider.connection
-  )
-  const [mint, metadataAddr, tx] = await createMint(
-    anchor.Wallet.local().payer.publicKey,
-    anchor.Wallet.local().payer.publicKey,
-    lamports,
-    data,
-    json_url
-  )
-  const signers = [mint, anchor.Wallet.local().payer]
-  await provider.sendAndConfirm(tx, signers)
+  const metadata = nft_data(payer.publicKey);
+  
+  const { mint, tokenAccount, metadataAccount, masterEditionAccount } = await mintNFT(
+    connection,
+    payer,
+    metadata,
+  );
 
-  return mint.publicKey
+  return mint
 }
 
 async function setup() {
-  let fromAirdropSignature = await provider.connection.requestAirdrop(
-    anchor.Wallet.local().payer.publicKey,
-    anchor.web3.LAMPORTS_PER_SOL,
-  )
-  await provider.connection.confirmTransaction(fromAirdropSignature)
+  // let fromAirdropSignature = await provider.connection.requestAirdrop(
+  //   payer.publicKey,
+  //   5 * anchor.web3.LAMPORTS_PER_SOL,
+  // )
+  // await confirmTx(provider.connection, fromAirdropSignature);
 
   let nftMint: PublicKey = await mintMeNft()
-  let comptoirMint = await splToken.Token.createMint(
-    provider.connection,
-    anchor.Wallet.local().payer,
-    anchor.Wallet.local().payer.publicKey,
+  let comptoirMint = await splToken.createMint(
+    connection,
+    payer,
+    payer.publicKey,
     null,
-    6,
-    splToken.TOKEN_PROGRAM_ID,
-  )
+    6
+  );
 
-  let ata = await comptoirMint.getOrCreateAssociatedAccountInfo(
-    anchor.Wallet.local().payer.publicKey
+  const ata = await splToken.getOrCreateAssociatedTokenAccount(
+    connection,
+    payer,
+    comptoirMint,
+    payer.publicKey,
   )
-  await comptoirMint.mintTo(ata.address, anchor.Wallet.local().payer, [], 1000)
-  return [comptoirMint.publicKey, nftMint]
+  
+  await splToken.mintTo(connection, payer, comptoirMint, ata.address, payer, 1000)
+ 
+  return [comptoirMint, nftMint]
 }
 
 (async () => {
-  let [comptoirMint, nftMint] = await setup()
+  // let [comptoirMint, nftMint] = await setup()
 
   await workflow(
-    comptoirMint,
-    nftMint
+    new PublicKey('HkrHYg2TECHYdk8bpvwHGVUN8RygxUyrLCwKxEhkotrk'),
+    new PublicKey('DMjdQQJsTdQfcL7dJ9ozYXMrL37KS3bAPeww2LU1sUyn')
   )
 })()

@@ -12,19 +12,18 @@ import {
   getNftVaultPDA,
   getSellOrderPDA,
 } from './getPDAs';
-import { getMetadata } from './metaplex';
-import { programs } from '@metaplex/js';
+import { getMetadata, getMetadataPDA } from './metaplex';
 import idl from './types/comptoir.json';
 import { IdlAccounts, web3 } from '@project-serum/anchor';
 import { Comptoir } from './comptoir';
-import { MetadataData } from '@metaplex/js/lib/programs/metadata';
-
-const { Metadata } = programs.metadata;
+import { Metaplex } from '@metaplex-foundation/js';
+import { Metadata } from "@metaplex-foundation/mpl-token-metadata";
 
 export class Collection {
   program: anchor.Program<ComptoirDefinition>;
   collectionPDA: PublicKey;
   comptoir: Comptoir;
+  provider: anchor.Provider;
 
   private collectionCache?: IdlAccounts<ComptoirDefinition>['Collection'];
 
@@ -39,6 +38,7 @@ export class Collection {
       comptoir.programID,
       provider
     );
+    this.provider = provider;
     this.collectionPDA = collectionPDA;
   }
 
@@ -54,10 +54,10 @@ export class Collection {
       throw new Error('comptoirPDA is not set');
     }
 
-    let programNftVaultPDA = await getNftVaultPDA(nftMint, this.comptoir.programID);
-    let sellOrderPDA = await getSellOrderPDA(sellerNftAccount, price, this.comptoir.programID);
+    const programNftVaultPDA = getNftVaultPDA(nftMint, this.comptoir.programID);
+    const sellOrderPDA = getSellOrderPDA(sellerNftAccount, price, this.comptoir.programID);
+    const metadataPDA = getMetadataPDA(this.provider.connection, nftMint);
 
-    let metadataPDA = await Metadata.getPDA(nftMint);
     return await this.program.methods
       .createSellOrder(price, amount, sellerDestination)
       .accounts({
@@ -102,7 +102,7 @@ export class Collection {
     amount: anchor.BN,
     seller: PublicKey
   ): Promise<TransactionInstruction> {
-    let programNftVaultPDA = await getNftVaultPDA(nftMint, this.comptoir.programID);
+    let programNftVaultPDA = getNftVaultPDA(nftMint, this.comptoir.programID);
     return await this.program.methods
       .removeSellOrder(amount)
       .accounts({
@@ -218,7 +218,8 @@ export class Collection {
       });
     }
 
-    let programNftVaultPDA = await getNftVaultPDA(nftMint, this.program.programId);
+    let programNftVaultPDA = getNftVaultPDA(nftMint, this.program.programId);
+    const metadataPDA = Metaplex.make(this.provider.connection).nfts().pdas().metadata({ mint: nftMint });
 
     return await this.program.methods
       .buy(wanted_quantity)
@@ -229,7 +230,7 @@ export class Collection {
         comptoir: this.comptoir.comptoirPDA,
         comptoirDestAccount: comptoirAccount.feesDestination,
         collection: this.collectionPDA,
-        metadata: await Metadata.getPDA(metadata.mint),
+        metadata: metadataPDA,
         vault: programNftVaultPDA,
         systemProgram: anchor.web3.SystemProgram.programId,
         tokenProgram: TOKEN_PROGRAM_ID,
@@ -284,7 +285,7 @@ export class Collection {
       this.comptoir.programID
     );
 
-    let metadataPDA = await Metadata.getPDA(nftMintToBuy);
+    const metadataPDA = getMetadataPDA(this.provider.connection, nftMintToBuy);
 
     return await this.program.methods
       .createBuyOffer(offerPrice)
@@ -324,7 +325,6 @@ export class Collection {
   }
 
   async removeBuyOfferInstruction(
-    nftMintToBuy: PublicKey,
     buyOfferPDA: PublicKey,
     buyerTokenAccount: PublicKey,
     buyer: PublicKey
@@ -356,13 +356,11 @@ export class Collection {
   }
 
   async removeBuyOffer(
-    nftMintToBuy: PublicKey,
     buyOfferPDA: PublicKey,
     buyerTokenAccount: PublicKey,
     buyer: Keypair
   ): Promise<string> {
     let ix = await this.removeBuyOfferInstruction(
-      nftMintToBuy,
       buyOfferPDA,
       buyerTokenAccount,
       buyer.publicKey
@@ -385,7 +383,7 @@ export class Collection {
       throw new Error('comptoirPDA is not set');
     }
 
-    let escrowPDA = await getEscrowPDA(
+    let escrowPDA = getEscrowPDA(
       this.comptoir.comptoirPDA,
       (
         await this.comptoir.getComptoir()
@@ -419,7 +417,7 @@ export class Collection {
         destination: buyerNftTokenAccount,
         sellerNftAccount: sellerNftTokenAccount,
         buyOffer: buyOfferPDA,
-        metadata: await Metadata.getPDA(nftMint),
+        metadata: getMetadataPDA(this.provider.connection, nftMint),
         systemProgram: anchor.web3.SystemProgram.programId,
         tokenProgram: TOKEN_PROGRAM_ID,
         rent: anchor.web3.SYSVAR_RENT_PUBKEY,
@@ -471,14 +469,14 @@ export class Collection {
     return this.program.provider.sendAll([{tx, signers}]);
   }
 
-  async _extractCreatorsAsRemainingAccount(metadata: MetadataData) {
+  async _extractCreatorsAsRemainingAccount(metadata: Metadata) {
     let creatorsAccounts = [];
     if (metadata.data?.creators) {
       for (let creator of metadata.data.creators) {
         let creatorAddress = new PublicKey(creator.address);
         let comptoirMint = (await this.comptoir.getComptoir()).mint;
 
-        let creatorATA = await getAssociatedTokenAddress(
+        let creatorATA = getAssociatedTokenAddress(
           creatorAddress,
           comptoirMint
         );

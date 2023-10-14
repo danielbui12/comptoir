@@ -28,3 +28,17 @@ Any seller owning that asset can then at any time accept the offer thus transfer
 ## Gitbook
 
 To understand the key concepts and get started creating your own marketplace check out the gitbook [here](https://aurory.gitbook.io/comptoir/)
+
+
+## Migrate to new version
+
+- [v] Refactoring source
+- [ ] Update tests/
+-   [ ] comptoir
+-   [ ] ignore_creator
+-   [ ] offer
+-   [o] sell_order
+- [v] Update packages/
+-   [v] main source
+-   [o] example
+- [ ] ...

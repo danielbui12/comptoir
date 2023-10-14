@@ -2,8 +2,7 @@ import * as anchor from '@project-serum/anchor';
 import { Comptoir as ComptoirDefinition } from './types/comptoir';
 import { COMPTOIR_PROGRAM_ID } from './constant';
 import idl from './types/comptoir.json';
-
-import { Keypair, PublicKey } from '@solana/web3.js';
+import { Keypair, PublicKey, SystemProgram, SYSVAR_RENT_PUBKEY } from '@solana/web3.js';
 import { TOKEN_PROGRAM_ID } from '@solana/spl-token';
 import { getCollectionPDA, getComptoirPDA, getEscrowPDA } from './getPDAs';
 import { IdlAccounts } from '@project-serum/anchor';
@@ -29,9 +28,8 @@ export class Comptoir {
     fees: number,
     feesDestination: PublicKey
   ): Promise<string> {
-    let comptoirPDA = await getComptoirPDA(owner.publicKey, this.programID);
-
-    let escrowPDA = await getEscrowPDA(comptoirPDA, mint, this.programID);
+    const comptoirPDA = getComptoirPDA(owner.publicKey, this.programID);
+    const escrowPDA = getEscrowPDA(comptoirPDA, mint, this.programID);
 
     this.comptoirPDA = comptoirPDA;
 
@@ -42,9 +40,9 @@ export class Comptoir {
         comptoir: comptoirPDA,
         mint: mint,
         escrow: escrowPDA,
-        systemProgram: anchor.web3.SystemProgram.programId,
+        systemProgram: SystemProgram.programId,
         tokenProgram: TOKEN_PROGRAM_ID,
-        rent: anchor.web3.SYSVAR_RENT_PUBKEY,
+        rent: SYSVAR_RENT_PUBKEY,
       })
       .signers([owner])
       .rpc();
@@ -61,7 +59,7 @@ export class Comptoir {
     if (!this.comptoirPDA) {
       throw new Error('comptoirPDA is not set');
     }
-    let collectionPDA = await getCollectionPDA(
+    let collectionPDA = getCollectionPDA(
       this.comptoirPDA,
         name,
         this.programID
@@ -79,8 +77,8 @@ export class Comptoir {
         authority: authority.publicKey,
         comptoir: this.comptoirPDA,
         collection: collectionPDA,
-        systemProgram: anchor.web3.SystemProgram.programId,
-        rent: anchor.web3.SYSVAR_RENT_PUBKEY,
+        systemProgram: SystemProgram.programId,
+        rent: SYSVAR_RENT_PUBKEY,
       })
       .signers([authority])
       .rpc();

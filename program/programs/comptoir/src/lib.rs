@@ -2,6 +2,7 @@ mod transfer;
 mod event;
 mod constant;
 mod error;
+mod state;
 
 use anchor_lang::prelude::*;
 use anchor_lang::AccountsClose;
@@ -11,7 +12,7 @@ use metaplex_token_metadata::state::{Creator, Metadata};
 use std::str::FromStr;
 use anchor_spl::associated_token::AssociatedToken;
 use metaplex_token_metadata::utils::{assert_derivation};
-use crate::{constant::*, event::*, error::*, transfer::*};
+use crate::{constant::*, event::*, error::*, transfer::*, state::*};
 
 declare_id!("EZxFrEd1TBL6A1zzSvcasnR7RyEwRqkLmBjvLsSCaKNc");
 
@@ -194,8 +195,8 @@ pub mod comptoir {
     pub fn buy<'a, 'b, 'c, 'info>(ctx: Context<'a, 'b, 'c, 'info, Buy<'info>>, ask_quantity: u64) -> Result<()> {
         let mut total_spent_ed: u64 = 0;
 
-        let mint_metadata = verify_metadata_and_derivation(
-            ctx.accounts.mint_metadata.as_ref(),
+        let metadata = verify_metadata_and_derivation(
+            ctx.accounts.metadata.as_ref(),
             &ctx.accounts.buyer_nft_token_account.mint.key(),
             &ctx.accounts.collection,
         )?;
@@ -203,7 +204,7 @@ pub mod comptoir {
 
         let mut creators_distributions_option: Option<Vec<(&AccountInfo, u8)>> = None;
         if !ctx.accounts.collection.ignore_creator_fee {
-            if let Some(creators)  = mint_metadata.data.creators {
+            if let Some(creators)  = metadata.data.creators {
                 index = creators.len();
                 let creators_distributions = verify_and_get_creators(creators, ctx.remaining_accounts, ctx.accounts.comptoir.mint);
                 creators_distributions_option = Some(creators_distributions);
@@ -257,7 +258,7 @@ pub mod comptoir {
             let total_amount = sell_order.price.checked_mul(to_buy).unwrap();
             let mut creators_share: u64 = 0;
             if !ctx.accounts.collection.ignore_creator_fee {
-                creators_share = calculate_fee(total_amount, mint_metadata.data.seller_fee_basis_points, 10000);
+                creators_share = calculate_fee(total_amount, metadata.data.seller_fee_basis_points, 10000);
             }
             let comptoir_share = calculate_fee(total_amount, comptoir_fee, 10000);
             let seller_share = total_amount.checked_sub(creators_share).unwrap().checked_sub(comptoir_share).unwrap();
@@ -295,7 +296,7 @@ pub mod comptoir {
                 sell_order: sell_order.key(),
                 quantity: to_buy,
                 collection: ctx.accounts.collection.key(),
-                mint_metadata: ctx.accounts.mint_metadata.key(),
+                metadata: ctx.accounts.metadata.key(),
                 comptoir: ctx.accounts.comptoir.key(),
             });
 
@@ -614,35 +615,35 @@ pub struct ExecuteOffer<'info> {
 pub struct CreateComptoir<'info> {
     #[account(mut)]
     payer: Signer<'info>,
+
     #[account(
-    init,
-    seeds = [
-        PREFIX,
-        payer.key.as_ref()
-    ],
-    bump,
-    payer = payer,
-    space = 112,
+      init,
+      seeds = [
+          PREFIX,
+          payer.key.as_ref()
+      ],
+      bump,
+      payer = payer,
+      space = 112,
     )]
     comptoir: Account<'info, Comptoir>,
 
     mint: Account<'info, Mint>,
 
     #[account(
-    init,
-    token::mint = mint,
-    token::authority = escrow,
-    seeds = [
-    PREFIX,
-    comptoir.key().as_ref(),
-    comptoir_mint.as_ref(),
-    ESCROW
-    ],
-    bump,
-    payer = payer,
+      init,
+      token::mint = mint,
+      token::authority = escrow,
+      seeds = [
+        PREFIX,
+        comptoir.key().as_ref(),
+        comptoir_mint.as_ref(),
+        ESCROW
+      ],
+      bump,
+      payer = payer,
     )]
     escrow: Account<'info, TokenAccount>,
-
 
     system_program: Program<'info, System>,
     token_program: Program<'info, Token>,
@@ -661,6 +662,7 @@ pub struct UpdateComptoir<'info> {
 pub struct UpdateComptoirMint<'info> {
     #[account(mut)]
     authority: Signer<'info>,
+    
     #[account(mut, has_one = authority)]
     comptoir: Account<'info, Comptoir>,
 
@@ -668,17 +670,17 @@ pub struct UpdateComptoirMint<'info> {
     mint: Account<'info, Mint>,
 
     #[account(
-    init_if_needed,
-    token::mint = mint,
-    token::authority = escrow,
-    seeds = [
-    PREFIX,
-    comptoir.key().as_ref(),
-    new_comptoir_mint.as_ref(),
-    ESCROW
-    ],
-    bump,
-    payer = authority,
+      init_if_needed,
+      token::mint = mint,
+      token::authority = escrow,
+      seeds = [
+        PREFIX,
+        comptoir.key().as_ref(),
+        new_comptoir_mint.as_ref(),
+        ESCROW
+      ],
+      bump,
+      payer = authority,
     )]
     escrow: Account<'info, TokenAccount>,
 
@@ -692,18 +694,20 @@ pub struct UpdateComptoirMint<'info> {
 pub struct CreateCollection<'info> {
     #[account(mut)]
     authority: Signer<'info>,
+
     #[account(mut, has_one = authority)]
     comptoir: Account<'info, Comptoir>,
+
     #[account(
-    init,
-    seeds = [
-    PREFIX,
-    name.as_bytes(),
-    comptoir.key().as_ref(),
-    ],
-    bump,
-    payer = authority,
-    space = 110,
+      init,
+      seeds = [
+          PREFIX,
+          name.as_bytes(),
+          comptoir.key().as_ref(),
+      ],
+      bump,
+      payer = authority,
+      space = 110,
     )]
     collection: Account<'info, Collection>,
 
@@ -739,29 +743,29 @@ pub struct CreateSellOrder<'info> {
     metadata: UncheckedAccount<'info>,
 
     #[account(
-    init_if_needed,
-    token::mint = mint,
-    token::authority = vault,
-    seeds = [
-    PREFIX,
-    "vault".as_bytes(),
-    seller_nft_token_account.mint.as_ref(),
-    ],
-    bump,
-    payer = payer,
+      init_if_needed,
+      token::mint = mint,
+      token::authority = vault,
+      seeds = [
+        PREFIX,
+        "vault".as_bytes(),
+        seller_nft_token_account.mint.as_ref(),
+      ],
+      bump,
+      payer = payer,
     )]
     vault: Account<'info, TokenAccount>,
 
     #[account(
-    init,
-    seeds = [
-    PREFIX,
-    seller_nft_token_account.key().as_ref(),
-    price.to_string().as_bytes(),
-    ],
-    bump,
-    payer = payer,
-    space = 152,
+      init,
+      seeds = [
+        PREFIX,
+        seller_nft_token_account.key().as_ref(),
+        price.to_string().as_bytes(),
+      ],
+      bump,
+      payer = payer,
+      space = 152,
     )]
     sell_order: Account<'info, SellOrder>,
 
@@ -780,13 +784,13 @@ pub struct RemoveSellOrder<'info> {
     sell_order: Account<'info, SellOrder>,
 
     #[account(
-    mut,
-    seeds = [
-    PREFIX,
-    "vault".as_bytes(),
-    seller_nft_token_account.mint.as_ref(),
-    ],
-    bump,
+      mut,
+      seeds = [
+        PREFIX,
+        "vault".as_bytes(),
+        seller_nft_token_account.mint.as_ref(),
+      ],
+      bump,
     )]
     vault: Account<'info, TokenAccount>,
 
@@ -805,13 +809,13 @@ pub struct SellOrderAddQuantity<'info> {
     sell_order: Account<'info, SellOrder>,
 
     #[account(
-    mut,
-    seeds = [
-    PREFIX,
-    "vault".as_bytes(),
-    seller_nft_token_account.mint.as_ref(),
-    ],
-    bump,
+      mut,
+        seeds = [
+        PREFIX,
+        "vault".as_bytes(),
+        seller_nft_token_account.mint.as_ref(),
+      ],
+      bump,
     )]
     vault: Account<'info, TokenAccount>,
 
@@ -835,58 +839,21 @@ pub struct Buy<'info> {
     collection: Account<'info, Collection>,
 
     /// CHECK: This is not dangerous because check it all the time using the verify_metadata_and_derivation func
-    mint_metadata: UncheckedAccount<'info>,
+    metadata: UncheckedAccount<'info>,
 
     #[account(
-    mut,
-    seeds = [
-    PREFIX,
-    "vault".as_bytes(),
-    buyer_nft_token_account.mint.as_ref()
-    ],
-    bump,
+      mut,
+      seeds = [
+        PREFIX,
+        "vault".as_bytes(),
+        buyer_nft_token_account.mint.as_ref()
+      ],
+      bump,
     )]
     vault: Box<Account<'info, TokenAccount>>,
 
     system_program: Program<'info, System>,
     token_program: Program<'info, Token>,
-}
-
-#[account]
-pub struct Comptoir {
-    fees: u16,
-    fees_destination: Pubkey,
-    authority: Pubkey,
-    mint: Pubkey,
-}
-
-#[account]
-pub struct SellOrder {
-    comptoir: Pubkey,
-    price: u64,
-    quantity: u64,
-    mint: Pubkey,
-    authority: Pubkey,
-    destination: Pubkey,
-}
-
-#[account]
-pub struct Collection {
-    comptoir_key: Pubkey,
-    name: String,
-    symbol: String,
-    required_verifier: Pubkey,
-    fees: Option<u16>, //Takes priority over comptoir fees
-    ignore_creator_fee: bool,
-}
-
-#[account]
-pub struct BuyOffer {
-    comptoir: Pubkey,
-    mint: Pubkey,
-    proposed_price: u64,
-    authority: Pubkey,
-    destination: Pubkey,
 }
 
 impl Collection {

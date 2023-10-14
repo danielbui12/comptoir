@@ -1,24 +1,26 @@
 [features]
+seeds = false
 skip-lint = false
 
 [programs.localnet]
 comptoir = "EZxFrEd1TBL6A1zzSvcasnR7RyEwRqkLmBjvLsSCaKNc"
 
+[programs.devnet]
+comptoir = "EZxFrEd1TBL6A1zzSvcasnR7RyEwRqkLmBjvLsSCaKNc"
 
 [registry]
-url = "http://127.0.0.1:8899"
-
-# [registry]
-# url = "https://anchor.projectserum.com"
+url = "https://anchor.projectserum.com"
+# url = "http://127.0.0.1:8899"
 
 [provider]
-cluster = "localnet"
+# cluster = "localnet"
+cluster = "devnet"
 wallet = "/home/daniel/.config/solana/id.json"
 
 [scripts]
-test = "yarn run ts-mocha -p ./tsconfig.json -t 1000000 tests/**/*.ts"
+test = "yarn run ts-mocha -t 1000000 tests/**/*.ts"
 client = "yarn run ts-node client/*.ts"
-example = "yarn run ts-node packages/comptoirjs/examples/complete_workflow.ts"
+example-wf = "yarn run ts-node packages/comptoirjs/examples/complete_workflow.ts"
 
 [[test.genesis]]
 address = "EZxFrEd1TBL6A1zzSvcasnR7RyEwRqkLmBjvLsSCaKNc"

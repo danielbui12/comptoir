@@ -3,11 +3,11 @@ import { COMPTOIR_PROGRAM_ID } from './constant';
 import { PublicKey } from '@solana/web3.js';
 import {
   ASSOCIATED_TOKEN_PROGRAM_ID,
-  Token,
   TOKEN_PROGRAM_ID,
+  getAssociatedTokenAddressSync,
 } from '@solana/spl-token';
 
-export const getComptoirPDA = async (owner: PublicKey, programID?: PublicKey): Promise<PublicKey> => {
+export const getComptoirPDA = (owner: PublicKey, programID?: PublicKey): PublicKey => {
   return (
     anchor.web3.PublicKey.findProgramAddressSync(
       [Buffer.from('COMPTOIR'), owner.toBuffer()],
@@ -16,11 +16,11 @@ export const getComptoirPDA = async (owner: PublicKey, programID?: PublicKey): P
   )[0];
 };
 
-export const getEscrowPDA = async (
+export const getEscrowPDA = (
   comptoirPDA: PublicKey,
   comptoirMint: PublicKey,
   programID?: PublicKey
-): Promise<PublicKey> => {
+): PublicKey => {
   return (
     anchor.web3.PublicKey.findProgramAddressSync(
       [
@@ -34,11 +34,11 @@ export const getEscrowPDA = async (
   )[0];
 };
 
-export const getCollectionPDA = async (
+export const getCollectionPDA = (
   comptoirPDA: PublicKey,
   name: string,
   programID?: PublicKey
-): Promise<PublicKey> => {
+): PublicKey => {
   return (
     anchor.web3.PublicKey.findProgramAddressSync(
       [Buffer.from('COMPTOIR'), Buffer.from(name), comptoirPDA.toBuffer()],
@@ -47,10 +47,10 @@ export const getCollectionPDA = async (
   )[0];
 };
 
-export const getNftVaultPDA = async (
+export const getNftVaultPDA = (
   nftMint: PublicKey,
   programID?: PublicKey
-): Promise<PublicKey> => {
+): PublicKey => {
   return (
     anchor.web3.PublicKey.findProgramAddressSync(
       [Buffer.from('COMPTOIR'), Buffer.from('vault'), nftMint.toBuffer()],
@@ -59,11 +59,11 @@ export const getNftVaultPDA = async (
   )[0];
 };
 
-export const getSellOrderPDA = async (
+export const getSellOrderPDA = (
   sellerTokenAccount: PublicKey,
   price: anchor.BN,
   programID?: PublicKey
-): Promise<PublicKey> => {
+): PublicKey => {
   return (
     anchor.web3.PublicKey.findProgramAddressSync(
       [
@@ -76,25 +76,25 @@ export const getSellOrderPDA = async (
   )[0];
 };
 
-export const getAssociatedTokenAddress = async (
+export const getAssociatedTokenAddress = (
   addr: PublicKey,
   mint: PublicKey,
-): Promise<PublicKey> => {
-  return await Token.getAssociatedTokenAddress(
-    ASSOCIATED_TOKEN_PROGRAM_ID,
-    TOKEN_PROGRAM_ID,
+): PublicKey => {
+  return getAssociatedTokenAddressSync(
     mint,
     addr,
-    false
+    false,
+    TOKEN_PROGRAM_ID,
+    ASSOCIATED_TOKEN_PROGRAM_ID,
   );
 };
-export const getBuyOfferPDA = async (
+export const getBuyOfferPDA = (
   comptoirPDA: PublicKey,
   buyer: PublicKey,
   mint: PublicKey,
   price: anchor.BN,
   programID?: PublicKey
-): Promise<PublicKey> => {
+): PublicKey => {
   return (
     anchor.web3.PublicKey.findProgramAddressSync(
       [

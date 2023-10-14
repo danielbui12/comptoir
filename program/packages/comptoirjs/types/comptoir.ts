@@ -1,6 +1,23 @@
 export type Comptoir = {
   "version": "0.1.0",
   "name": "comptoir",
+  "constants": [
+    {
+      "name": "ASSOCIATED_TOKEN_PROGRAM",
+      "type": "string",
+      "value": "\"ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL\""
+    },
+    {
+      "name": "PREFIX",
+      "type": "bytes",
+      "value": "[67, 79, 77, 80, 84, 79, 73, 82]"
+    },
+    {
+      "name": "ESCROW",
+      "type": "bytes",
+      "value": "[69, 83, 67, 82, 79, 87]"
+    }
+  ],
   "instructions": [
     {
       "name": "createComptoir",
@@ -793,8 +810,68 @@ export type Comptoir = {
   ],
   "events": [
     {
+      "name": "CreateSellOrderEvent",
+      "fields": [
+        {
+          "name": "sellOrder",
+          "type": "publicKey",
+          "index": false
+        },
+        {
+          "name": "price",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "quantity",
+          "type": "u64",
+          "index": false
+        }
+      ]
+    },
+    {
+      "name": "RemoveSellOrderEvent",
+      "fields": [
+        {
+          "name": "sellOrder",
+          "type": "publicKey",
+          "index": false
+        },
+        {
+          "name": "quantityToUnlist",
+          "type": "u64",
+          "index": false
+        }
+      ]
+    },
+    {
+      "name": "BuyEvent",
+      "fields": [
+        {
+          "name": "buyer",
+          "type": "publicKey",
+          "index": false
+        },
+        {
+          "name": "askQuantity",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "maxPrice",
+          "type": "u64",
+          "index": false
+        }
+      ]
+    },
+    {
       "name": "BoughtSellOrderEvent",
       "fields": [
+        {
+          "name": "buyer",
+          "type": "publicKey",
+          "index": false
+        },
         {
           "name": "sellOrder",
           "type": "publicKey",
@@ -806,7 +883,52 @@ export type Comptoir = {
           "index": false
         },
         {
-          "name": "buyer",
+          "name": "collection",
+          "type": "publicKey",
+          "index": false
+        },
+        {
+          "name": "metadata",
+          "type": "publicKey",
+          "index": false
+        },
+        {
+          "name": "comptoir",
+          "type": "publicKey",
+          "index": false
+        }
+      ]
+    },
+    {
+      "name": "CreateBuyOfferEvent",
+      "fields": [
+        {
+          "name": "buyOffer",
+          "type": "publicKey",
+          "index": false
+        },
+        {
+          "name": "priceProposition",
+          "type": "u64",
+          "index": false
+        }
+      ]
+    },
+    {
+      "name": "RemoveBuyOfferEvent",
+      "fields": [
+        {
+          "name": "buyOffer",
+          "type": "publicKey",
+          "index": false
+        }
+      ]
+    },
+    {
+      "name": "ExecuteOfferEvent",
+      "fields": [
+        {
+          "name": "buyOffer",
           "type": "publicKey",
           "index": false
         }
@@ -855,6 +977,23 @@ export type Comptoir = {
 export const IDL: Comptoir = {
   "version": "0.1.0",
   "name": "comptoir",
+  "constants": [
+    {
+      "name": "ASSOCIATED_TOKEN_PROGRAM",
+      "type": "string",
+      "value": "\"ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL\""
+    },
+    {
+      "name": "PREFIX",
+      "type": "bytes",
+      "value": "[67, 79, 77, 80, 84, 79, 73, 82]"
+    },
+    {
+      "name": "ESCROW",
+      "type": "bytes",
+      "value": "[69, 83, 67, 82, 79, 87]"
+    }
+  ],
   "instructions": [
     {
       "name": "createComptoir",
@@ -1647,8 +1786,68 @@ export const IDL: Comptoir = {
   ],
   "events": [
     {
+      "name": "CreateSellOrderEvent",
+      "fields": [
+        {
+          "name": "sellOrder",
+          "type": "publicKey",
+          "index": false
+        },
+        {
+          "name": "price",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "quantity",
+          "type": "u64",
+          "index": false
+        }
+      ]
+    },
+    {
+      "name": "RemoveSellOrderEvent",
+      "fields": [
+        {
+          "name": "sellOrder",
+          "type": "publicKey",
+          "index": false
+        },
+        {
+          "name": "quantityToUnlist",
+          "type": "u64",
+          "index": false
+        }
+      ]
+    },
+    {
+      "name": "BuyEvent",
+      "fields": [
+        {
+          "name": "buyer",
+          "type": "publicKey",
+          "index": false
+        },
+        {
+          "name": "askQuantity",
+          "type": "u64",
+          "index": false
+        },
+        {
+          "name": "maxPrice",
+          "type": "u64",
+          "index": false
+        }
+      ]
+    },
+    {
       "name": "BoughtSellOrderEvent",
       "fields": [
+        {
+          "name": "buyer",
+          "type": "publicKey",
+          "index": false
+        },
         {
           "name": "sellOrder",
           "type": "publicKey",
@@ -1660,7 +1859,52 @@ export const IDL: Comptoir = {
           "index": false
         },
         {
-          "name": "buyer",
+          "name": "collection",
+          "type": "publicKey",
+          "index": false
+        },
+        {
+          "name": "metadata",
+          "type": "publicKey",
+          "index": false
+        },
+        {
+          "name": "comptoir",
+          "type": "publicKey",
+          "index": false
+        }
+      ]
+    },
+    {
+      "name": "CreateBuyOfferEvent",
+      "fields": [
+        {
+          "name": "buyOffer",
+          "type": "publicKey",
+          "index": false
+        },
+        {
+          "name": "priceProposition",
+          "type": "u64",
+          "index": false
+        }
+      ]
+    },
+    {
+      "name": "RemoveBuyOfferEvent",
+      "fields": [
+        {
+          "name": "buyOffer",
+          "type": "publicKey",
+          "index": false
+        }
+      ]
+    },
+    {
+      "name": "ExecuteOfferEvent",
+      "fields": [
+        {
+          "name": "buyOffer",
           "type": "publicKey",
           "index": false
         }

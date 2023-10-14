@@ -26,7 +26,7 @@ pub struct BoughtSellOrderEvent {
   pub sell_order: Pubkey,
   pub quantity: u64,
   pub collection: Pubkey,
-  pub mint_metadata: Pubkey,
+  pub metadata: Pubkey,
   pub comptoir: Pubkey,
 }
 
