@@ -6,103 +6,86 @@
  */
 
 import * as splToken from '@solana/spl-token'
-import * as web3 from '@solana/web3.js'
-import * as beetSolana from '@metaplex-foundation/beet-solana'
 import * as beet from '@metaplex-foundation/beet'
+import * as web3 from '@solana/web3.js'
 
 /**
  * @category Instructions
- * @category CreateComptoir
+ * @category RemoveBuyOffer
  * @category generated
  */
-export type CreateComptoirInstructionArgs = {
-  mint: web3.PublicKey
-  fees: number
-  feesDestination: web3.PublicKey
-  authority: web3.PublicKey
-}
-/**
- * @category Instructions
- * @category CreateComptoir
- * @category generated
- */
-export const createComptoirStruct = new beet.BeetArgsStruct<
-  CreateComptoirInstructionArgs & {
-    instructionDiscriminator: number[] /* size: 8 */
-  }
->(
-  [
-    ['instructionDiscriminator', beet.uniformFixedSizeArray(beet.u8, 8)],
-    ['mint', beetSolana.publicKey],
-    ['fees', beet.u16],
-    ['feesDestination', beetSolana.publicKey],
-    ['authority', beetSolana.publicKey],
-  ],
-  'CreateComptoirInstructionArgs'
+export const removeBuyOfferStruct = new beet.BeetArgsStruct<{
+  instructionDiscriminator: number[] /* size: 8 */
+}>(
+  [['instructionDiscriminator', beet.uniformFixedSizeArray(beet.u8, 8)]],
+  'RemoveBuyOfferInstructionArgs'
 )
 /**
- * Accounts required by the _createComptoir_ instruction
+ * Accounts required by the _removeBuyOffer_ instruction
  *
- * @property [_writable_, **signer**] payer
- * @property [_writable_] comptoir
- * @property [] mint
+ * @property [_writable_, **signer**] buyer
+ * @property [_writable_] buyerPayingAccount
+ * @property [] comptoir
  * @property [_writable_] escrow
+ * @property [_writable_] buyOffer
  * @category Instructions
- * @category CreateComptoir
+ * @category RemoveBuyOffer
  * @category generated
  */
-export type CreateComptoirInstructionAccounts = {
-  payer: web3.PublicKey
+export type RemoveBuyOfferInstructionAccounts = {
+  buyer: web3.PublicKey
+  buyerPayingAccount: web3.PublicKey
   comptoir: web3.PublicKey
-  mint: web3.PublicKey
   escrow: web3.PublicKey
+  buyOffer: web3.PublicKey
   systemProgram?: web3.PublicKey
   tokenProgram?: web3.PublicKey
   rent?: web3.PublicKey
   anchorRemainingAccounts?: web3.AccountMeta[]
 }
 
-export const createComptoirInstructionDiscriminator = [
-  108, 4, 214, 51, 56, 168, 122, 154,
+export const removeBuyOfferInstructionDiscriminator = [
+  174, 218, 46, 172, 180, 214, 39, 236,
 ]
 
 /**
- * Creates a _CreateComptoir_ instruction.
+ * Creates a _RemoveBuyOffer_ instruction.
  *
  * @param accounts that will be accessed while the instruction is processed
- * @param args to provide as instruction data to the program
- *
  * @category Instructions
- * @category CreateComptoir
+ * @category RemoveBuyOffer
  * @category generated
  */
-export function createCreateComptoirInstruction(
-  accounts: CreateComptoirInstructionAccounts,
-  args: CreateComptoirInstructionArgs,
-  programId = new web3.PublicKey('FCoMPzD3cihsM7EBSbXtorF2yHL4jJ6vrbWtdVaN7qZc')
+export function createRemoveBuyOfferInstruction(
+  accounts: RemoveBuyOfferInstructionAccounts,
+  programId = new web3.PublicKey('FY4tLSXn95o5YuecY3sAfPCoPk9ZSs2cvFa9HiHYPFgy')
 ) {
-  const [data] = createComptoirStruct.serialize({
-    instructionDiscriminator: createComptoirInstructionDiscriminator,
-    ...args,
+  const [data] = removeBuyOfferStruct.serialize({
+    instructionDiscriminator: removeBuyOfferInstructionDiscriminator,
   })
   const keys: web3.AccountMeta[] = [
     {
-      pubkey: accounts.payer,
+      pubkey: accounts.buyer,
       isWritable: true,
       isSigner: true,
     },
     {
-      pubkey: accounts.comptoir,
+      pubkey: accounts.buyerPayingAccount,
       isWritable: true,
       isSigner: false,
     },
     {
-      pubkey: accounts.mint,
+      pubkey: accounts.comptoir,
       isWritable: false,
       isSigner: false,
     },
     {
       pubkey: accounts.escrow,
+      isWritable: true,
+      isSigner: false,
+    },
+    {
+      pubkey: accounts.buyOffer,
       isWritable: true,
       isSigner: false,
     },

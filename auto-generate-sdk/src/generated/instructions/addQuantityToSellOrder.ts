@@ -5,82 +5,77 @@
  * See: https://github.com/metaplex-foundation/solita
  */
 
-import * as web3 from '@solana/web3.js'
+import * as splToken from '@solana/spl-token'
 import * as beet from '@metaplex-foundation/beet'
-import * as beetSolana from '@metaplex-foundation/beet-solana'
+import * as web3 from '@solana/web3.js'
 
 /**
  * @category Instructions
- * @category CreateCollection
+ * @category AddQuantityToSellOrder
  * @category generated
  */
-export type CreateCollectionInstructionArgs = {
-  name: string
-  symbol: string
-  requiredVerifier: web3.PublicKey
-  fee: beet.COption<number>
-  ignoreFee: boolean
+export type AddQuantityToSellOrderInstructionArgs = {
+  quantityToAdd: beet.bignum
 }
 /**
  * @category Instructions
- * @category CreateCollection
+ * @category AddQuantityToSellOrder
  * @category generated
  */
-export const createCollectionStruct = new beet.FixableBeetArgsStruct<
-  CreateCollectionInstructionArgs & {
+export const addQuantityToSellOrderStruct = new beet.BeetArgsStruct<
+  AddQuantityToSellOrderInstructionArgs & {
     instructionDiscriminator: number[] /* size: 8 */
   }
 >(
   [
     ['instructionDiscriminator', beet.uniformFixedSizeArray(beet.u8, 8)],
-    ['name', beet.utf8String],
-    ['symbol', beet.utf8String],
-    ['requiredVerifier', beetSolana.publicKey],
-    ['fee', beet.coption(beet.u16)],
-    ['ignoreFee', beet.bool],
+    ['quantityToAdd', beet.u64],
   ],
-  'CreateCollectionInstructionArgs'
+  'AddQuantityToSellOrderInstructionArgs'
 )
 /**
- * Accounts required by the _createCollection_ instruction
+ * Accounts required by the _addQuantityToSellOrder_ instruction
  *
  * @property [_writable_, **signer**] authority
- * @property [_writable_] comptoir
- * @property [_writable_] collection
+ * @property [_writable_] sellerNftTokenAccount
+ * @property [_writable_] sellOrder
+ * @property [_writable_] vault
  * @category Instructions
- * @category CreateCollection
+ * @category AddQuantityToSellOrder
  * @category generated
  */
-export type CreateCollectionInstructionAccounts = {
+export type AddQuantityToSellOrderInstructionAccounts = {
   authority: web3.PublicKey
-  comptoir: web3.PublicKey
-  collection: web3.PublicKey
+  sellerNftTokenAccount: web3.PublicKey
+  sellOrder: web3.PublicKey
+  vault: web3.PublicKey
   systemProgram?: web3.PublicKey
+  tokenProgram?: web3.PublicKey
   rent?: web3.PublicKey
   anchorRemainingAccounts?: web3.AccountMeta[]
 }
 
-export const createCollectionInstructionDiscriminator = [
-  156, 251, 92, 54, 233, 2, 16, 82,
+export const addQuantityToSellOrderInstructionDiscriminator = [
+  195, 215, 132, 169, 2, 103, 47, 168,
 ]
 
 /**
- * Creates a _CreateCollection_ instruction.
+ * Creates a _AddQuantityToSellOrder_ instruction.
  *
  * @param accounts that will be accessed while the instruction is processed
  * @param args to provide as instruction data to the program
  *
  * @category Instructions
- * @category CreateCollection
+ * @category AddQuantityToSellOrder
  * @category generated
  */
-export function createCreateCollectionInstruction(
-  accounts: CreateCollectionInstructionAccounts,
-  args: CreateCollectionInstructionArgs,
-  programId = new web3.PublicKey('FCoMPzD3cihsM7EBSbXtorF2yHL4jJ6vrbWtdVaN7qZc')
+export function createAddQuantityToSellOrderInstruction(
+  accounts: AddQuantityToSellOrderInstructionAccounts,
+  args: AddQuantityToSellOrderInstructionArgs,
+  programId = new web3.PublicKey('FY4tLSXn95o5YuecY3sAfPCoPk9ZSs2cvFa9HiHYPFgy')
 ) {
-  const [data] = createCollectionStruct.serialize({
-    instructionDiscriminator: createCollectionInstructionDiscriminator,
+  const [data] = addQuantityToSellOrderStruct.serialize({
+    instructionDiscriminator: addQuantityToSellOrderInstructionDiscriminator,
     ...args,
   })
   const keys: web3.AccountMeta[] = [
@@ -90,17 +85,27 @@ export function createCreateCollectionInstruction(
       isSigner: true,
     },
     {
-      pubkey: accounts.comptoir,
+      pubkey: accounts.sellerNftTokenAccount,
       isWritable: true,
       isSigner: false,
     },
     {
-      pubkey: accounts.collection,
+      pubkey: accounts.sellOrder,
+      isWritable: true,
+      isSigner: false,
+    },
+    {
+      pubkey: accounts.vault,
       isWritable: true,
       isSigner: false,
     },
     {
       pubkey: accounts.systemProgram ?? web3.SystemProgram.programId,
+      isWritable: false,
+      isSigner: false,
+    },
+    {
+      pubkey: accounts.tokenProgram ?? splToken.TOKEN_PROGRAM_ID,
       isWritable: false,
       isSigner: false,
     },

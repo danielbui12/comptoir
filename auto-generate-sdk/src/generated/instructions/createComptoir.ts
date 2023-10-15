@@ -6,96 +6,103 @@
  */
 
 import * as splToken from '@solana/spl-token'
-import * as beet from '@metaplex-foundation/beet'
 import * as web3 from '@solana/web3.js'
+import * as beetSolana from '@metaplex-foundation/beet-solana'
+import * as beet from '@metaplex-foundation/beet'
 
 /**
  * @category Instructions
- * @category RemoveSellOrder
+ * @category CreateComptoir
  * @category generated
  */
-export type RemoveSellOrderInstructionArgs = {
-  quantityToUnlist: beet.bignum
+export type CreateComptoirInstructionArgs = {
+  mint: web3.PublicKey
+  fees: number
+  feesDestination: web3.PublicKey
+  authority: web3.PublicKey
 }
 /**
  * @category Instructions
- * @category RemoveSellOrder
+ * @category CreateComptoir
  * @category generated
  */
-export const removeSellOrderStruct = new beet.BeetArgsStruct<
-  RemoveSellOrderInstructionArgs & {
+export const createComptoirStruct = new beet.BeetArgsStruct<
+  CreateComptoirInstructionArgs & {
     instructionDiscriminator: number[] /* size: 8 */
   }
 >(
   [
     ['instructionDiscriminator', beet.uniformFixedSizeArray(beet.u8, 8)],
-    ['quantityToUnlist', beet.u64],
+    ['mint', beetSolana.publicKey],
+    ['fees', beet.u16],
+    ['feesDestination', beetSolana.publicKey],
+    ['authority', beetSolana.publicKey],
   ],
-  'RemoveSellOrderInstructionArgs'
+  'CreateComptoirInstructionArgs'
 )
 /**
- * Accounts required by the _removeSellOrder_ instruction
+ * Accounts required by the _createComptoir_ instruction
  *
- * @property [_writable_, **signer**] authority
- * @property [_writable_] sellerNftTokenAccount
- * @property [_writable_] sellOrder
- * @property [_writable_] vault
+ * @property [_writable_, **signer**] payer
+ * @property [_writable_] comptoir
+ * @property [] mint
+ * @property [_writable_] escrow
  * @category Instructions
- * @category RemoveSellOrder
+ * @category CreateComptoir
  * @category generated
  */
-export type RemoveSellOrderInstructionAccounts = {
-  authority: web3.PublicKey
-  sellerNftTokenAccount: web3.PublicKey
-  sellOrder: web3.PublicKey
-  vault: web3.PublicKey
+export type CreateComptoirInstructionAccounts = {
+  payer: web3.PublicKey
+  comptoir: web3.PublicKey
+  mint: web3.PublicKey
+  escrow: web3.PublicKey
   systemProgram?: web3.PublicKey
   tokenProgram?: web3.PublicKey
   rent?: web3.PublicKey
   anchorRemainingAccounts?: web3.AccountMeta[]
 }
 
-export const removeSellOrderInstructionDiscriminator = [
-  57, 120, 155, 176, 154, 186, 201, 80,
+export const createComptoirInstructionDiscriminator = [
+  108, 4, 214, 51, 56, 168, 122, 154,
 ]
 
 /**
- * Creates a _RemoveSellOrder_ instruction.
+ * Creates a _CreateComptoir_ instruction.
  *
  * @param accounts that will be accessed while the instruction is processed
  * @param args to provide as instruction data to the program
  *
  * @category Instructions
- * @category RemoveSellOrder
+ * @category CreateComptoir
  * @category generated
  */
-export function createRemoveSellOrderInstruction(
-  accounts: RemoveSellOrderInstructionAccounts,
-  args: RemoveSellOrderInstructionArgs,
-  programId = new web3.PublicKey('FCoMPzD3cihsM7EBSbXtorF2yHL4jJ6vrbWtdVaN7qZc')
+export function createCreateComptoirInstruction(
+  accounts: CreateComptoirInstructionAccounts,
+  args: CreateComptoirInstructionArgs,
+  programId = new web3.PublicKey('FY4tLSXn95o5YuecY3sAfPCoPk9ZSs2cvFa9HiHYPFgy')
 ) {
-  const [data] = removeSellOrderStruct.serialize({
-    instructionDiscriminator: removeSellOrderInstructionDiscriminator,
+  const [data] = createComptoirStruct.serialize({
+    instructionDiscriminator: createComptoirInstructionDiscriminator,
     ...args,
   })
   const keys: web3.AccountMeta[] = [
     {
-      pubkey: accounts.authority,
+      pubkey: accounts.payer,
       isWritable: true,
       isSigner: true,
     },
     {
-      pubkey: accounts.sellerNftTokenAccount,
+      pubkey: accounts.comptoir,
       isWritable: true,
       isSigner: false,
     },
     {
-      pubkey: accounts.sellOrder,
-      isWritable: true,
+      pubkey: accounts.mint,
+      isWritable: false,
       isSigner: false,
     },
     {
-      pubkey: accounts.vault,
+      pubkey: accounts.escrow,
       isWritable: true,
       isSigner: false,
     },

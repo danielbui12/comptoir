@@ -95,7 +95,7 @@ export class Collection implements CollectionArgs {
    */
   static gpaBuilder(
     programId: web3.PublicKey = new web3.PublicKey(
-      'FCoMPzD3cihsM7EBSbXtorF2yHL4jJ6vrbWtdVaN7qZc'
+      'FY4tLSXn95o5YuecY3sAfPCoPk9ZSs2cvFa9HiHYPFgy'
     )
   ) {
     return beetSolana.GpaBuilder.fromStruct(programId, collectionBeet)

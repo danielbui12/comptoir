@@ -11,40 +11,40 @@ import * as web3 from '@solana/web3.js'
 
 /**
  * @category Instructions
- * @category AddQuantityToSellOrder
+ * @category RemoveSellOrder
  * @category generated
  */
-export type AddQuantityToSellOrderInstructionArgs = {
-  quantityToAdd: beet.bignum
+export type RemoveSellOrderInstructionArgs = {
+  quantityToUnlist: beet.bignum
 }
 /**
  * @category Instructions
- * @category AddQuantityToSellOrder
+ * @category RemoveSellOrder
  * @category generated
  */
-export const addQuantityToSellOrderStruct = new beet.BeetArgsStruct<
-  AddQuantityToSellOrderInstructionArgs & {
+export const removeSellOrderStruct = new beet.BeetArgsStruct<
+  RemoveSellOrderInstructionArgs & {
     instructionDiscriminator: number[] /* size: 8 */
   }
 >(
   [
     ['instructionDiscriminator', beet.uniformFixedSizeArray(beet.u8, 8)],
-    ['quantityToAdd', beet.u64],
+    ['quantityToUnlist', beet.u64],
   ],
-  'AddQuantityToSellOrderInstructionArgs'
+  'RemoveSellOrderInstructionArgs'
 )
 /**
- * Accounts required by the _addQuantityToSellOrder_ instruction
+ * Accounts required by the _removeSellOrder_ instruction
  *
  * @property [_writable_, **signer**] authority
  * @property [_writable_] sellerNftTokenAccount
  * @property [_writable_] sellOrder
  * @property [_writable_] vault
  * @category Instructions
- * @category AddQuantityToSellOrder
+ * @category RemoveSellOrder
  * @category generated
  */
-export type AddQuantityToSellOrderInstructionAccounts = {
+export type RemoveSellOrderInstructionAccounts = {
   authority: web3.PublicKey
   sellerNftTokenAccount: web3.PublicKey
   sellOrder: web3.PublicKey
@@ -55,27 +55,27 @@ export type AddQuantityToSellOrderInstructionAccounts = {
   anchorRemainingAccounts?: web3.AccountMeta[]
 }
 
-export const addQuantityToSellOrderInstructionDiscriminator = [
-  195, 215, 132, 169, 2, 103, 47, 168,
+export const removeSellOrderInstructionDiscriminator = [
+  57, 120, 155, 176, 154, 186, 201, 80,
 ]
 
 /**
- * Creates a _AddQuantityToSellOrder_ instruction.
+ * Creates a _RemoveSellOrder_ instruction.
  *
  * @param accounts that will be accessed while the instruction is processed
  * @param args to provide as instruction data to the program
  *
  * @category Instructions
- * @category AddQuantityToSellOrder
+ * @category RemoveSellOrder
  * @category generated
  */
-export function createAddQuantityToSellOrderInstruction(
-  accounts: AddQuantityToSellOrderInstructionAccounts,
-  args: AddQuantityToSellOrderInstructionArgs,
-  programId = new web3.PublicKey('FCoMPzD3cihsM7EBSbXtorF2yHL4jJ6vrbWtdVaN7qZc')
+export function createRemoveSellOrderInstruction(
+  accounts: RemoveSellOrderInstructionAccounts,
+  args: RemoveSellOrderInstructionArgs,
+  programId = new web3.PublicKey('FY4tLSXn95o5YuecY3sAfPCoPk9ZSs2cvFa9HiHYPFgy')
 ) {
-  const [data] = addQuantityToSellOrderStruct.serialize({
-    instructionDiscriminator: addQuantityToSellOrderInstructionDiscriminator,
+  const [data] = removeSellOrderStruct.serialize({
+    instructionDiscriminator: removeSellOrderInstructionDiscriminator,
     ...args,
   })
   const keys: web3.AccountMeta[] = [

@@ -11,72 +11,68 @@ import * as beetSolana from '@metaplex-foundation/beet-solana'
 
 /**
  * @category Instructions
- * @category UpdateCollection
+ * @category UpdateComptoir
  * @category generated
  */
-export type UpdateCollectionInstructionArgs = {
-  optionalFee: beet.COption<number>
-  optionalSymbol: beet.COption<string>
-  optionalRequiredVerifier: beet.COption<web3.PublicKey>
-  optionalIgnoreCreatorFee: beet.COption<boolean>
+export type UpdateComptoirInstructionArgs = {
+  optionalFees: beet.COption<number>
+  optionalFeesDestination: beet.COption<web3.PublicKey>
+  optionalAuthority: beet.COption<web3.PublicKey>
 }
 /**
  * @category Instructions
- * @category UpdateCollection
+ * @category UpdateComptoir
  * @category generated
  */
-export const updateCollectionStruct = new beet.FixableBeetArgsStruct<
-  UpdateCollectionInstructionArgs & {
+export const updateComptoirStruct = new beet.FixableBeetArgsStruct<
+  UpdateComptoirInstructionArgs & {
     instructionDiscriminator: number[] /* size: 8 */
   }
 >(
   [
     ['instructionDiscriminator', beet.uniformFixedSizeArray(beet.u8, 8)],
-    ['optionalFee', beet.coption(beet.u16)],
-    ['optionalSymbol', beet.coption(beet.utf8String)],
-    ['optionalRequiredVerifier', beet.coption(beetSolana.publicKey)],
-    ['optionalIgnoreCreatorFee', beet.coption(beet.bool)],
+    ['optionalFees', beet.coption(beet.u16)],
+    ['optionalFeesDestination', beet.coption(beetSolana.publicKey)],
+    ['optionalAuthority', beet.coption(beetSolana.publicKey)],
   ],
-  'UpdateCollectionInstructionArgs'
+  'UpdateComptoirInstructionArgs'
 )
 /**
- * Accounts required by the _updateCollection_ instruction
+ * Accounts required by the _updateComptoir_ instruction
  *
  * @property [**signer**] authority
- * @property [] comptoir
- * @property [_writable_] collection
+ * @property [_writable_] comptoir
  * @category Instructions
- * @category UpdateCollection
+ * @category UpdateComptoir
  * @category generated
  */
-export type UpdateCollectionInstructionAccounts = {
+export type UpdateComptoirInstructionAccounts = {
   authority: web3.PublicKey
   comptoir: web3.PublicKey
-  collection: web3.PublicKey
   anchorRemainingAccounts?: web3.AccountMeta[]
 }
 
-export const updateCollectionInstructionDiscriminator = [
-  97, 70, 36, 49, 138, 12, 199, 239,
+export const updateComptoirInstructionDiscriminator = [
+  249, 151, 213, 178, 44, 0, 146, 204,
 ]
 
 /**
- * Creates a _UpdateCollection_ instruction.
+ * Creates a _UpdateComptoir_ instruction.
  *
  * @param accounts that will be accessed while the instruction is processed
  * @param args to provide as instruction data to the program
  *
  * @category Instructions
- * @category UpdateCollection
+ * @category UpdateComptoir
  * @category generated
  */
-export function createUpdateCollectionInstruction(
-  accounts: UpdateCollectionInstructionAccounts,
-  args: UpdateCollectionInstructionArgs,
-  programId = new web3.PublicKey('FCoMPzD3cihsM7EBSbXtorF2yHL4jJ6vrbWtdVaN7qZc')
+export function createUpdateComptoirInstruction(
+  accounts: UpdateComptoirInstructionAccounts,
+  args: UpdateComptoirInstructionArgs,
+  programId = new web3.PublicKey('FY4tLSXn95o5YuecY3sAfPCoPk9ZSs2cvFa9HiHYPFgy')
 ) {
-  const [data] = updateCollectionStruct.serialize({
-    instructionDiscriminator: updateCollectionInstructionDiscriminator,
+  const [data] = updateComptoirStruct.serialize({
+    instructionDiscriminator: updateComptoirInstructionDiscriminator,
     ...args,
   })
   const keys: web3.AccountMeta[] = [
@@ -87,11 +83,6 @@ export function createUpdateCollectionInstruction(
     },
     {
       pubkey: accounts.comptoir,
-      isWritable: false,
-      isSigner: false,
-    },
-    {
-      pubkey: accounts.collection,
       isWritable: true,
       isSigner: false,
     },

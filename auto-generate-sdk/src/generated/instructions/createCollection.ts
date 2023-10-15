@@ -5,80 +5,82 @@
  * See: https://github.com/metaplex-foundation/solita
  */
 
-import * as splToken from '@solana/spl-token'
 import * as web3 from '@solana/web3.js'
-import * as beetSolana from '@metaplex-foundation/beet-solana'
 import * as beet from '@metaplex-foundation/beet'
+import * as beetSolana from '@metaplex-foundation/beet-solana'
 
 /**
  * @category Instructions
- * @category UpdateComptoirMint
+ * @category CreateCollection
  * @category generated
  */
-export type UpdateComptoirMintInstructionArgs = {
-  mint: web3.PublicKey
-  feesDestination: web3.PublicKey
+export type CreateCollectionInstructionArgs = {
+  name: string
+  symbol: string
+  requiredVerifier: web3.PublicKey
+  fee: beet.COption<number>
+  ignoreFee: boolean
 }
 /**
  * @category Instructions
- * @category UpdateComptoirMint
+ * @category CreateCollection
  * @category generated
  */
-export const updateComptoirMintStruct = new beet.BeetArgsStruct<
-  UpdateComptoirMintInstructionArgs & {
+export const createCollectionStruct = new beet.FixableBeetArgsStruct<
+  CreateCollectionInstructionArgs & {
     instructionDiscriminator: number[] /* size: 8 */
   }
 >(
   [
     ['instructionDiscriminator', beet.uniformFixedSizeArray(beet.u8, 8)],
-    ['mint', beetSolana.publicKey],
-    ['feesDestination', beetSolana.publicKey],
+    ['name', beet.utf8String],
+    ['symbol', beet.utf8String],
+    ['requiredVerifier', beetSolana.publicKey],
+    ['fee', beet.coption(beet.u16)],
+    ['ignoreFee', beet.bool],
   ],
-  'UpdateComptoirMintInstructionArgs'
+  'CreateCollectionInstructionArgs'
 )
 /**
- * Accounts required by the _updateComptoirMint_ instruction
+ * Accounts required by the _createCollection_ instruction
  *
  * @property [_writable_, **signer**] authority
  * @property [_writable_] comptoir
- * @property [] mint
- * @property [_writable_] escrow
+ * @property [_writable_] collection
  * @category Instructions
- * @category UpdateComptoirMint
+ * @category CreateCollection
  * @category generated
  */
-export type UpdateComptoirMintInstructionAccounts = {
+export type CreateCollectionInstructionAccounts = {
   authority: web3.PublicKey
   comptoir: web3.PublicKey
-  mint: web3.PublicKey
-  escrow: web3.PublicKey
+  collection: web3.PublicKey
   systemProgram?: web3.PublicKey
-  tokenProgram?: web3.PublicKey
   rent?: web3.PublicKey
   anchorRemainingAccounts?: web3.AccountMeta[]
 }
 
-export const updateComptoirMintInstructionDiscriminator = [
-  100, 204, 93, 218, 159, 220, 150, 92,
+export const createCollectionInstructionDiscriminator = [
+  156, 251, 92, 54, 233, 2, 16, 82,
 ]
 
 /**
- * Creates a _UpdateComptoirMint_ instruction.
+ * Creates a _CreateCollection_ instruction.
  *
  * @param accounts that will be accessed while the instruction is processed
  * @param args to provide as instruction data to the program
  *
  * @category Instructions
- * @category UpdateComptoirMint
+ * @category CreateCollection
  * @category generated
  */
-export function createUpdateComptoirMintInstruction(
-  accounts: UpdateComptoirMintInstructionAccounts,
-  args: UpdateComptoirMintInstructionArgs,
-  programId = new web3.PublicKey('FCoMPzD3cihsM7EBSbXtorF2yHL4jJ6vrbWtdVaN7qZc')
+export function createCreateCollectionInstruction(
+  accounts: CreateCollectionInstructionAccounts,
+  args: CreateCollectionInstructionArgs,
+  programId = new web3.PublicKey('FY4tLSXn95o5YuecY3sAfPCoPk9ZSs2cvFa9HiHYPFgy')
 ) {
-  const [data] = updateComptoirMintStruct.serialize({
-    instructionDiscriminator: updateComptoirMintInstructionDiscriminator,
+  const [data] = createCollectionStruct.serialize({
+    instructionDiscriminator: createCollectionInstructionDiscriminator,
     ...args,
   })
   const keys: web3.AccountMeta[] = [
@@ -93,22 +95,12 @@ export function createUpdateComptoirMintInstruction(
       isSigner: false,
     },
     {
-      pubkey: accounts.mint,
-      isWritable: false,
-      isSigner: false,
-    },
-    {
-      pubkey: accounts.escrow,
+      pubkey: accounts.collection,
       isWritable: true,
       isSigner: false,
     },
     {
       pubkey: accounts.systemProgram ?? web3.SystemProgram.programId,
-      isWritable: false,
-      isSigner: false,
-    },
-    {
-      pubkey: accounts.tokenProgram ?? splToken.TOKEN_PROGRAM_ID,
       isWritable: false,
       isSigner: false,
     },

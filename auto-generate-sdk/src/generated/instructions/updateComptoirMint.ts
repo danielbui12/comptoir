@@ -6,86 +6,99 @@
  */
 
 import * as splToken from '@solana/spl-token'
-import * as beet from '@metaplex-foundation/beet'
 import * as web3 from '@solana/web3.js'
+import * as beetSolana from '@metaplex-foundation/beet-solana'
+import * as beet from '@metaplex-foundation/beet'
 
 /**
  * @category Instructions
- * @category RemoveBuyOffer
+ * @category UpdateComptoirMint
  * @category generated
  */
-export const removeBuyOfferStruct = new beet.BeetArgsStruct<{
-  instructionDiscriminator: number[] /* size: 8 */
-}>(
-  [['instructionDiscriminator', beet.uniformFixedSizeArray(beet.u8, 8)]],
-  'RemoveBuyOfferInstructionArgs'
+export type UpdateComptoirMintInstructionArgs = {
+  mint: web3.PublicKey
+  feesDestination: web3.PublicKey
+}
+/**
+ * @category Instructions
+ * @category UpdateComptoirMint
+ * @category generated
+ */
+export const updateComptoirMintStruct = new beet.BeetArgsStruct<
+  UpdateComptoirMintInstructionArgs & {
+    instructionDiscriminator: number[] /* size: 8 */
+  }
+>(
+  [
+    ['instructionDiscriminator', beet.uniformFixedSizeArray(beet.u8, 8)],
+    ['mint', beetSolana.publicKey],
+    ['feesDestination', beetSolana.publicKey],
+  ],
+  'UpdateComptoirMintInstructionArgs'
 )
 /**
- * Accounts required by the _removeBuyOffer_ instruction
+ * Accounts required by the _updateComptoirMint_ instruction
  *
- * @property [_writable_, **signer**] buyer
- * @property [_writable_] buyerPayingAccount
- * @property [] comptoir
+ * @property [_writable_, **signer**] authority
+ * @property [_writable_] comptoir
+ * @property [] mint
  * @property [_writable_] escrow
- * @property [_writable_] buyOffer
  * @category Instructions
- * @category RemoveBuyOffer
+ * @category UpdateComptoirMint
  * @category generated
  */
-export type RemoveBuyOfferInstructionAccounts = {
-  buyer: web3.PublicKey
-  buyerPayingAccount: web3.PublicKey
+export type UpdateComptoirMintInstructionAccounts = {
+  authority: web3.PublicKey
   comptoir: web3.PublicKey
+  mint: web3.PublicKey
   escrow: web3.PublicKey
-  buyOffer: web3.PublicKey
   systemProgram?: web3.PublicKey
   tokenProgram?: web3.PublicKey
   rent?: web3.PublicKey
   anchorRemainingAccounts?: web3.AccountMeta[]
 }
 
-export const removeBuyOfferInstructionDiscriminator = [
-  174, 218, 46, 172, 180, 214, 39, 236,
+export const updateComptoirMintInstructionDiscriminator = [
+  100, 204, 93, 218, 159, 220, 150, 92,
 ]
 
 /**
- * Creates a _RemoveBuyOffer_ instruction.
+ * Creates a _UpdateComptoirMint_ instruction.
  *
  * @param accounts that will be accessed while the instruction is processed
+ * @param args to provide as instruction data to the program
+ *
  * @category Instructions
- * @category RemoveBuyOffer
+ * @category UpdateComptoirMint
  * @category generated
  */
-export function createRemoveBuyOfferInstruction(
-  accounts: RemoveBuyOfferInstructionAccounts,
-  programId = new web3.PublicKey('FCoMPzD3cihsM7EBSbXtorF2yHL4jJ6vrbWtdVaN7qZc')
+export function createUpdateComptoirMintInstruction(
+  accounts: UpdateComptoirMintInstructionAccounts,
+  args: UpdateComptoirMintInstructionArgs,
+  programId = new web3.PublicKey('FY4tLSXn95o5YuecY3sAfPCoPk9ZSs2cvFa9HiHYPFgy')
 ) {
-  const [data] = removeBuyOfferStruct.serialize({
-    instructionDiscriminator: removeBuyOfferInstructionDiscriminator,
+  const [data] = updateComptoirMintStruct.serialize({
+    instructionDiscriminator: updateComptoirMintInstructionDiscriminator,
+    ...args,
   })
   const keys: web3.AccountMeta[] = [
     {
-      pubkey: accounts.buyer,
+      pubkey: accounts.authority,
       isWritable: true,
       isSigner: true,
     },
     {
-      pubkey: accounts.buyerPayingAccount,
+      pubkey: accounts.comptoir,
       isWritable: true,
       isSigner: false,
     },
     {
-      pubkey: accounts.comptoir,
+      pubkey: accounts.mint,
       isWritable: false,
       isSigner: false,
     },
     {
       pubkey: accounts.escrow,
-      isWritable: true,
-      isSigner: false,
-    },
-    {
-      pubkey: accounts.buyOffer,
       isWritable: true,
       isSigner: false,
     },

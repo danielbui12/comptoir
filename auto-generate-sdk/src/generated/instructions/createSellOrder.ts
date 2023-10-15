@@ -8,94 +8,97 @@
 import * as splToken from '@solana/spl-token'
 import * as beet from '@metaplex-foundation/beet'
 import * as web3 from '@solana/web3.js'
+import * as beetSolana from '@metaplex-foundation/beet-solana'
 
 /**
  * @category Instructions
- * @category Buy
+ * @category CreateSellOrder
  * @category generated
  */
-export type BuyInstructionArgs = {
-  askQuantity: beet.bignum
+export type CreateSellOrderInstructionArgs = {
+  price: beet.bignum
+  quantity: beet.bignum
+  destination: web3.PublicKey
 }
 /**
  * @category Instructions
- * @category Buy
+ * @category CreateSellOrder
  * @category generated
  */
-export const buyStruct = new beet.BeetArgsStruct<
-  BuyInstructionArgs & {
+export const createSellOrderStruct = new beet.BeetArgsStruct<
+  CreateSellOrderInstructionArgs & {
     instructionDiscriminator: number[] /* size: 8 */
   }
 >(
   [
     ['instructionDiscriminator', beet.uniformFixedSizeArray(beet.u8, 8)],
-    ['askQuantity', beet.u64],
+    ['price', beet.u64],
+    ['quantity', beet.u64],
+    ['destination', beetSolana.publicKey],
   ],
-  'BuyInstructionArgs'
+  'CreateSellOrderInstructionArgs'
 )
 /**
- * Accounts required by the _buy_ instruction
+ * Accounts required by the _createSellOrder_ instruction
  *
- * @property [**signer**] buyer
- * @property [_writable_] buyerNftTokenAccount
- * @property [_writable_] buyerPayingTokenAccount
+ * @property [_writable_, **signer**] payer
+ * @property [_writable_] sellerNftTokenAccount
  * @property [] comptoir
- * @property [_writable_] comptoirDestAccount
  * @property [] collection
- * @property [] mintMetadata
+ * @property [] mint
+ * @property [] metadata
  * @property [_writable_] vault
+ * @property [_writable_] sellOrder
  * @category Instructions
- * @category Buy
+ * @category CreateSellOrder
  * @category generated
  */
-export type BuyInstructionAccounts = {
-  buyer: web3.PublicKey
-  buyerNftTokenAccount: web3.PublicKey
-  buyerPayingTokenAccount: web3.PublicKey
+export type CreateSellOrderInstructionAccounts = {
+  payer: web3.PublicKey
+  sellerNftTokenAccount: web3.PublicKey
   comptoir: web3.PublicKey
-  comptoirDestAccount: web3.PublicKey
   collection: web3.PublicKey
-  mintMetadata: web3.PublicKey
+  mint: web3.PublicKey
+  metadata: web3.PublicKey
   vault: web3.PublicKey
+  sellOrder: web3.PublicKey
   systemProgram?: web3.PublicKey
   tokenProgram?: web3.PublicKey
+  rent?: web3.PublicKey
   anchorRemainingAccounts?: web3.AccountMeta[]
 }
 
-export const buyInstructionDiscriminator = [102, 6, 61, 18, 1, 218, 235, 234]
+export const createSellOrderInstructionDiscriminator = [
+  53, 52, 255, 44, 191, 74, 171, 225,
+]
 
 /**
- * Creates a _Buy_ instruction.
+ * Creates a _CreateSellOrder_ instruction.
  *
  * @param accounts that will be accessed while the instruction is processed
  * @param args to provide as instruction data to the program
  *
  * @category Instructions
- * @category Buy
+ * @category CreateSellOrder
  * @category generated
  */
-export function createBuyInstruction(
-  accounts: BuyInstructionAccounts,
-  args: BuyInstructionArgs,
-  programId = new web3.PublicKey('FCoMPzD3cihsM7EBSbXtorF2yHL4jJ6vrbWtdVaN7qZc')
+export function createCreateSellOrderInstruction(
+  accounts: CreateSellOrderInstructionAccounts,
+  args: CreateSellOrderInstructionArgs,
+  programId = new web3.PublicKey('FY4tLSXn95o5YuecY3sAfPCoPk9ZSs2cvFa9HiHYPFgy')
 ) {
-  const [data] = buyStruct.serialize({
-    instructionDiscriminator: buyInstructionDiscriminator,
+  const [data] = createSellOrderStruct.serialize({
+    instructionDiscriminator: createSellOrderInstructionDiscriminator,
     ...args,
   })
   const keys: web3.AccountMeta[] = [
     {
-      pubkey: accounts.buyer,
-      isWritable: false,
+      pubkey: accounts.payer,
+      isWritable: true,
       isSigner: true,
     },
     {
-      pubkey: accounts.buyerNftTokenAccount,
-      isWritable: true,
-      isSigner: false,
-    },
-    {
-      pubkey: accounts.buyerPayingTokenAccount,
+      pubkey: accounts.sellerNftTokenAccount,
       isWritable: true,
       isSigner: false,
     },
@@ -105,22 +108,27 @@ export function createBuyInstruction(
       isSigner: false,
     },
     {
-      pubkey: accounts.comptoirDestAccount,
-      isWritable: true,
-      isSigner: false,
-    },
-    {
       pubkey: accounts.collection,
       isWritable: false,
       isSigner: false,
     },
     {
-      pubkey: accounts.mintMetadata,
+      pubkey: accounts.mint,
+      isWritable: false,
+      isSigner: false,
+    },
+    {
+      pubkey: accounts.metadata,
       isWritable: false,
       isSigner: false,
     },
     {
       pubkey: accounts.vault,
+      isWritable: true,
+      isSigner: false,
+    },
+    {
+      pubkey: accounts.sellOrder,
       isWritable: true,
       isSigner: false,
     },
@@ -131,6 +139,11 @@ export function createBuyInstruction(
     },
     {
       pubkey: accounts.tokenProgram ?? splToken.TOKEN_PROGRAM_ID,
+      isWritable: false,
+      isSigner: false,
+    },
+    {
+      pubkey: accounts.rent ?? web3.SYSVAR_RENT_PUBKEY,
       isWritable: false,
       isSigner: false,
     },

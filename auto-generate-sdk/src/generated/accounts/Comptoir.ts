@@ -10,62 +10,59 @@ import * as beet from '@metaplex-foundation/beet'
 import * as beetSolana from '@metaplex-foundation/beet-solana'
 
 /**
- * Arguments used to create {@link BuyOffer}
+ * Arguments used to create {@link Comptoir}
  * @category Accounts
  * @category generated
  */
-export type BuyOfferArgs = {
-  comptoir: web3.PublicKey
-  mint: web3.PublicKey
-  proposedPrice: beet.bignum
+export type ComptoirArgs = {
+  fees: number
+  feesDestination: web3.PublicKey
   authority: web3.PublicKey
-  destination: web3.PublicKey
+  mint: web3.PublicKey
 }
 
-export const buyOfferDiscriminator = [247, 133, 161, 252, 116, 1, 4, 172]
+export const comptoirDiscriminator = [33, 70, 255, 164, 49, 5, 149, 215]
 /**
- * Holds the data for the {@link BuyOffer} Account and provides de/serialization
+ * Holds the data for the {@link Comptoir} Account and provides de/serialization
  * functionality for that data
  *
  * @category Accounts
  * @category generated
  */
-export class BuyOffer implements BuyOfferArgs {
+export class Comptoir implements ComptoirArgs {
   private constructor(
-    readonly comptoir: web3.PublicKey,
-    readonly mint: web3.PublicKey,
-    readonly proposedPrice: beet.bignum,
+    readonly fees: number,
+    readonly feesDestination: web3.PublicKey,
     readonly authority: web3.PublicKey,
-    readonly destination: web3.PublicKey
+    readonly mint: web3.PublicKey
   ) {}
 
   /**
-   * Creates a {@link BuyOffer} instance from the provided args.
+   * Creates a {@link Comptoir} instance from the provided args.
    */
-  static fromArgs(args: BuyOfferArgs) {
-    return new BuyOffer(
-      args.comptoir,
-      args.mint,
-      args.proposedPrice,
+  static fromArgs(args: ComptoirArgs) {
+    return new Comptoir(
+      args.fees,
+      args.feesDestination,
       args.authority,
-      args.destination
+      args.mint
     )
   }
 
   /**
-   * Deserializes the {@link BuyOffer} from the data of the provided {@link web3.AccountInfo}.
+   * Deserializes the {@link Comptoir} from the data of the provided {@link web3.AccountInfo}.
    * @returns a tuple of the account data and the offset up to which the buffer was read to obtain it.
    */
   static fromAccountInfo(
     accountInfo: web3.AccountInfo<Buffer>,
     offset = 0
-  ): [BuyOffer, number] {
-    return BuyOffer.deserialize(accountInfo.data, offset)
+  ): [Comptoir, number] {
+    return Comptoir.deserialize(accountInfo.data, offset)
   }
 
   /**
    * Retrieves the account info from the provided address and deserializes
-   * the {@link BuyOffer} from its data.
+   * the {@link Comptoir} from its data.
    *
    * @throws Error if no account info is found at the address or if deserialization fails
    */
@@ -73,15 +70,15 @@ export class BuyOffer implements BuyOfferArgs {
     connection: web3.Connection,
     address: web3.PublicKey,
     commitmentOrConfig?: web3.Commitment | web3.GetAccountInfoConfig
-  ): Promise<BuyOffer> {
+  ): Promise<Comptoir> {
     const accountInfo = await connection.getAccountInfo(
       address,
       commitmentOrConfig
     )
     if (accountInfo == null) {
-      throw new Error(`Unable to find BuyOffer account at ${address}`)
+      throw new Error(`Unable to find Comptoir account at ${address}`)
     }
-    return BuyOffer.fromAccountInfo(accountInfo, 0)[0]
+    return Comptoir.fromAccountInfo(accountInfo, 0)[0]
   }
 
   /**
@@ -92,42 +89,42 @@ export class BuyOffer implements BuyOfferArgs {
    */
   static gpaBuilder(
     programId: web3.PublicKey = new web3.PublicKey(
-      'FCoMPzD3cihsM7EBSbXtorF2yHL4jJ6vrbWtdVaN7qZc'
+      'FY4tLSXn95o5YuecY3sAfPCoPk9ZSs2cvFa9HiHYPFgy'
     )
   ) {
-    return beetSolana.GpaBuilder.fromStruct(programId, buyOfferBeet)
+    return beetSolana.GpaBuilder.fromStruct(programId, comptoirBeet)
   }
 
   /**
-   * Deserializes the {@link BuyOffer} from the provided data Buffer.
+   * Deserializes the {@link Comptoir} from the provided data Buffer.
    * @returns a tuple of the account data and the offset up to which the buffer was read to obtain it.
    */
-  static deserialize(buf: Buffer, offset = 0): [BuyOffer, number] {
-    return buyOfferBeet.deserialize(buf, offset)
+  static deserialize(buf: Buffer, offset = 0): [Comptoir, number] {
+    return comptoirBeet.deserialize(buf, offset)
   }
 
   /**
-   * Serializes the {@link BuyOffer} into a Buffer.
+   * Serializes the {@link Comptoir} into a Buffer.
    * @returns a tuple of the created Buffer and the offset up to which the buffer was written to store it.
    */
   serialize(): [Buffer, number] {
-    return buyOfferBeet.serialize({
-      accountDiscriminator: buyOfferDiscriminator,
+    return comptoirBeet.serialize({
+      accountDiscriminator: comptoirDiscriminator,
       ...this,
     })
   }
 
   /**
    * Returns the byteSize of a {@link Buffer} holding the serialized data of
-   * {@link BuyOffer}
+   * {@link Comptoir}
    */
   static get byteSize() {
-    return buyOfferBeet.byteSize
+    return comptoirBeet.byteSize
   }
 
   /**
    * Fetches the minimum balance needed to exempt an account holding
-   * {@link BuyOffer} data from rent
+   * {@link Comptoir} data from rent
    *
    * @param connection used to retrieve the rent exemption information
    */
@@ -136,40 +133,29 @@ export class BuyOffer implements BuyOfferArgs {
     commitment?: web3.Commitment
   ): Promise<number> {
     return connection.getMinimumBalanceForRentExemption(
-      BuyOffer.byteSize,
+      Comptoir.byteSize,
       commitment
     )
   }
 
   /**
    * Determines if the provided {@link Buffer} has the correct byte size to
-   * hold {@link BuyOffer} data.
+   * hold {@link Comptoir} data.
    */
   static hasCorrectByteSize(buf: Buffer, offset = 0) {
-    return buf.byteLength - offset === BuyOffer.byteSize
+    return buf.byteLength - offset === Comptoir.byteSize
   }
 
   /**
-   * Returns a readable version of {@link BuyOffer} properties
+   * Returns a readable version of {@link Comptoir} properties
    * and can be used to convert to JSON and/or logging
    */
   pretty() {
     return {
-      comptoir: this.comptoir.toBase58(),
-      mint: this.mint.toBase58(),
-      proposedPrice: (() => {
-        const x = <{ toNumber: () => number }>this.proposedPrice
-        if (typeof x.toNumber === 'function') {
-          try {
-            return x.toNumber()
-          } catch (_) {
-            return x
-          }
-        }
-        return x
-      })(),
+      fees: this.fees,
+      feesDestination: this.feesDestination.toBase58(),
       authority: this.authority.toBase58(),
-      destination: this.destination.toBase58(),
+      mint: this.mint.toBase58(),
     }
   }
 }
@@ -178,20 +164,19 @@ export class BuyOffer implements BuyOfferArgs {
  * @category Accounts
  * @category generated
  */
-export const buyOfferBeet = new beet.BeetStruct<
-  BuyOffer,
-  BuyOfferArgs & {
+export const comptoirBeet = new beet.BeetStruct<
+  Comptoir,
+  ComptoirArgs & {
     accountDiscriminator: number[] /* size: 8 */
   }
 >(
   [
     ['accountDiscriminator', beet.uniformFixedSizeArray(beet.u8, 8)],
-    ['comptoir', beetSolana.publicKey],
-    ['mint', beetSolana.publicKey],
-    ['proposedPrice', beet.u64],
+    ['fees', beet.u16],
+    ['feesDestination', beetSolana.publicKey],
     ['authority', beetSolana.publicKey],
-    ['destination', beetSolana.publicKey],
+    ['mint', beetSolana.publicKey],
   ],
-  BuyOffer.fromArgs,
-  'BuyOffer'
+  Comptoir.fromArgs,
+  'Comptoir'
 )

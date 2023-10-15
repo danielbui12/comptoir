@@ -10,59 +10,65 @@ import * as beet from '@metaplex-foundation/beet'
 import * as beetSolana from '@metaplex-foundation/beet-solana'
 
 /**
- * Arguments used to create {@link Comptoir}
+ * Arguments used to create {@link SellOrder}
  * @category Accounts
  * @category generated
  */
-export type ComptoirArgs = {
-  fees: number
-  feesDestination: web3.PublicKey
-  authority: web3.PublicKey
+export type SellOrderArgs = {
+  comptoir: web3.PublicKey
+  price: beet.bignum
+  quantity: beet.bignum
   mint: web3.PublicKey
+  authority: web3.PublicKey
+  destination: web3.PublicKey
 }
 
-export const comptoirDiscriminator = [33, 70, 255, 164, 49, 5, 149, 215]
+export const sellOrderDiscriminator = [125, 28, 219, 150, 25, 64, 250, 236]
 /**
- * Holds the data for the {@link Comptoir} Account and provides de/serialization
+ * Holds the data for the {@link SellOrder} Account and provides de/serialization
  * functionality for that data
  *
  * @category Accounts
  * @category generated
  */
-export class Comptoir implements ComptoirArgs {
+export class SellOrder implements SellOrderArgs {
   private constructor(
-    readonly fees: number,
-    readonly feesDestination: web3.PublicKey,
+    readonly comptoir: web3.PublicKey,
+    readonly price: beet.bignum,
+    readonly quantity: beet.bignum,
+    readonly mint: web3.PublicKey,
     readonly authority: web3.PublicKey,
-    readonly mint: web3.PublicKey
+    readonly destination: web3.PublicKey
   ) {}
 
   /**
-   * Creates a {@link Comptoir} instance from the provided args.
+   * Creates a {@link SellOrder} instance from the provided args.
    */
-  static fromArgs(args: ComptoirArgs) {
-    return new Comptoir(
-      args.fees,
-      args.feesDestination,
+  static fromArgs(args: SellOrderArgs) {
+    return new SellOrder(
+      args.comptoir,
+      args.price,
+      args.quantity,
+      args.mint,
       args.authority,
-      args.mint
+      args.destination
     )
   }
 
   /**
-   * Deserializes the {@link Comptoir} from the data of the provided {@link web3.AccountInfo}.
+   * Deserializes the {@link SellOrder} from the data of the provided {@link web3.AccountInfo}.
    * @returns a tuple of the account data and the offset up to which the buffer was read to obtain it.
    */
   static fromAccountInfo(
     accountInfo: web3.AccountInfo<Buffer>,
     offset = 0
-  ): [Comptoir, number] {
-    return Comptoir.deserialize(accountInfo.data, offset)
+  ): [SellOrder, number] {
+    return SellOrder.deserialize(accountInfo.data, offset)
   }
 
   /**
    * Retrieves the account info from the provided address and deserializes
-   * the {@link Comptoir} from its data.
+   * the {@link SellOrder} from its data.
    *
    * @throws Error if no account info is found at the address or if deserialization fails
    */
@@ -70,15 +76,15 @@ export class Comptoir implements ComptoirArgs {
     connection: web3.Connection,
     address: web3.PublicKey,
     commitmentOrConfig?: web3.Commitment | web3.GetAccountInfoConfig
-  ): Promise<Comptoir> {
+  ): Promise<SellOrder> {
     const accountInfo = await connection.getAccountInfo(
       address,
       commitmentOrConfig
     )
     if (accountInfo == null) {
-      throw new Error(`Unable to find Comptoir account at ${address}`)
+      throw new Error(`Unable to find SellOrder account at ${address}`)
     }
-    return Comptoir.fromAccountInfo(accountInfo, 0)[0]
+    return SellOrder.fromAccountInfo(accountInfo, 0)[0]
   }
 
   /**
@@ -89,42 +95,42 @@ export class Comptoir implements ComptoirArgs {
    */
   static gpaBuilder(
     programId: web3.PublicKey = new web3.PublicKey(
-      'FCoMPzD3cihsM7EBSbXtorF2yHL4jJ6vrbWtdVaN7qZc'
+      'FY4tLSXn95o5YuecY3sAfPCoPk9ZSs2cvFa9HiHYPFgy'
     )
   ) {
-    return beetSolana.GpaBuilder.fromStruct(programId, comptoirBeet)
+    return beetSolana.GpaBuilder.fromStruct(programId, sellOrderBeet)
   }
 
   /**
-   * Deserializes the {@link Comptoir} from the provided data Buffer.
+   * Deserializes the {@link SellOrder} from the provided data Buffer.
    * @returns a tuple of the account data and the offset up to which the buffer was read to obtain it.
    */
-  static deserialize(buf: Buffer, offset = 0): [Comptoir, number] {
-    return comptoirBeet.deserialize(buf, offset)
+  static deserialize(buf: Buffer, offset = 0): [SellOrder, number] {
+    return sellOrderBeet.deserialize(buf, offset)
   }
 
   /**
-   * Serializes the {@link Comptoir} into a Buffer.
+   * Serializes the {@link SellOrder} into a Buffer.
    * @returns a tuple of the created Buffer and the offset up to which the buffer was written to store it.
    */
   serialize(): [Buffer, number] {
-    return comptoirBeet.serialize({
-      accountDiscriminator: comptoirDiscriminator,
+    return sellOrderBeet.serialize({
+      accountDiscriminator: sellOrderDiscriminator,
       ...this,
     })
   }
 
   /**
    * Returns the byteSize of a {@link Buffer} holding the serialized data of
-   * {@link Comptoir}
+   * {@link SellOrder}
    */
   static get byteSize() {
-    return comptoirBeet.byteSize
+    return sellOrderBeet.byteSize
   }
 
   /**
    * Fetches the minimum balance needed to exempt an account holding
-   * {@link Comptoir} data from rent
+   * {@link SellOrder} data from rent
    *
    * @param connection used to retrieve the rent exemption information
    */
@@ -133,29 +139,51 @@ export class Comptoir implements ComptoirArgs {
     commitment?: web3.Commitment
   ): Promise<number> {
     return connection.getMinimumBalanceForRentExemption(
-      Comptoir.byteSize,
+      SellOrder.byteSize,
       commitment
     )
   }
 
   /**
    * Determines if the provided {@link Buffer} has the correct byte size to
-   * hold {@link Comptoir} data.
+   * hold {@link SellOrder} data.
    */
   static hasCorrectByteSize(buf: Buffer, offset = 0) {
-    return buf.byteLength - offset === Comptoir.byteSize
+    return buf.byteLength - offset === SellOrder.byteSize
   }
 
   /**
-   * Returns a readable version of {@link Comptoir} properties
+   * Returns a readable version of {@link SellOrder} properties
    * and can be used to convert to JSON and/or logging
    */
   pretty() {
     return {
-      fees: this.fees,
-      feesDestination: this.feesDestination.toBase58(),
-      authority: this.authority.toBase58(),
+      comptoir: this.comptoir.toBase58(),
+      price: (() => {
+        const x = <{ toNumber: () => number }>this.price
+        if (typeof x.toNumber === 'function') {
+          try {
+            return x.toNumber()
+          } catch (_) {
+            return x
+          }
+        }
+        return x
+      })(),
+      quantity: (() => {
+        const x = <{ toNumber: () => number }>this.quantity
+        if (typeof x.toNumber === 'function') {
+          try {
+            return x.toNumber()
+          } catch (_) {
+            return x
+          }
+        }
+        return x
+      })(),
       mint: this.mint.toBase58(),
+      authority: this.authority.toBase58(),
+      destination: this.destination.toBase58(),
     }
   }
 }
@@ -164,19 +192,21 @@ export class Comptoir implements ComptoirArgs {
  * @category Accounts
  * @category generated
  */
-export const comptoirBeet = new beet.BeetStruct<
-  Comptoir,
-  ComptoirArgs & {
+export const sellOrderBeet = new beet.BeetStruct<
+  SellOrder,
+  SellOrderArgs & {
     accountDiscriminator: number[] /* size: 8 */
   }
 >(
   [
     ['accountDiscriminator', beet.uniformFixedSizeArray(beet.u8, 8)],
-    ['fees', beet.u16],
-    ['feesDestination', beetSolana.publicKey],
-    ['authority', beetSolana.publicKey],
+    ['comptoir', beetSolana.publicKey],
+    ['price', beet.u64],
+    ['quantity', beet.u64],
     ['mint', beetSolana.publicKey],
+    ['authority', beetSolana.publicKey],
+    ['destination', beetSolana.publicKey],
   ],
-  Comptoir.fromArgs,
-  'Comptoir'
+  SellOrder.fromArgs,
+  'SellOrder'
 )

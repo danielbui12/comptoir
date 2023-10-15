@@ -4,31 +4,31 @@ const { Solita } = require('@metaplex-foundation/solita');
 const { writeFile } = require('fs/promises');
 
 const PROGRAM_NAME = 'comptoir';
-const PROGRAM_ID = 'FCoMPzD3cihsM7EBSbXtorF2yHL4jJ6vrbWtdVaN7qZc';
+const PROGRAM_ID = 'FY4tLSXn95o5YuecY3sAfPCoPk9ZSs2cvFa9HiHYPFgy';
 
 const programDir = path.join(__dirname, '..', 'program', 'programs', 'comptoir');
 const generatedIdlDir = path.join(__dirname, 'idl');
 const generatedSDKDir = path.join(__dirname, 'src', 'generated');
 
 async function main() {
-    // console.error('This may takes a while for installing package requirement...')
-    // const anchor = spawn("anchor", ['build', '--idl', generatedIdlDir], { cwd: programDir })
-    //     .on('error', (err) => {
-    //         console.error(err);
-    //         if (err.code === 'ENOENT') {
-    //             console.error(
-    //                 'Ensure that `anchor` is installed and in your path, see:\n  https://www.anchor-lang.com/docs/installation\n',
-    //             );
-    //         }
-    //         process.exit(1);
-    //     })
-    //     .on('exit', () => {
-    //         console.log('IDL written to: %s', path.join(generatedIdlDir, `${PROGRAM_NAME}.json`));
+    console.error('This may takes a while for installing package requirement...')
+    const anchor = spawn("anchor", ['build', '--idl', generatedIdlDir], { cwd: programDir })
+        .on('error', (err) => {
+            console.error(err);
+            if (err.code === 'ENOENT') {
+                console.error(
+                    'Ensure that `anchor` is installed and in your path, see:\n  https://www.anchor-lang.com/docs/installation\n',
+                );
+            }
+            process.exit(1);
+        })
+        .on('exit', () => {
+            console.log('IDL written to: %s', path.join(generatedIdlDir, `${PROGRAM_NAME}.json`));
             generateTypeScriptSDK();
-    //     });
+        });
 
-    // anchor.stdout.on('data', (buf) => console.log(buf.toString('utf8')));
-    // anchor.stderr.on('data', (buf) => console.error(buf.toString('utf8')));
+    anchor.stdout.on('data', (buf) => console.log(buf.toString('utf8')));
+    anchor.stderr.on('data', (buf) => console.error(buf.toString('utf8')));
 }
 
 async function generateTypeScriptSDK() {
