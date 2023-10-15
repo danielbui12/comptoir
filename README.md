@@ -1,14 +1,18 @@
 ## Migrating source
 
-- [:heavy_check_mark:] Refactoring source
-- [:heavy_check_mark:] Updating packages
-- [:white_check_mark:] Update uint tests <-- this might be not updated because local validator doesn't support NFT  
--   [:white_check_mark:] comptoir
--   [:white_check_mark:] ignore_creator
--   [:white_check_mark:] offer
--   [:white_check_mark:] sell_order
-- [:heavy_check_mark:] Update comptoirjs/
--   [:heavy_check_mark:] example work flow
--   [:heavy_check_mark:] utils function
--   [:heavy_check_mark:] program call function
-- [ ] ...
+:white_check_mark: Refactoring source
+
+:white_check_mark: Updating packages version
+
+:white_square_button: Updating uint-testing (this might be not updated because local validator doesn't support NFT)
+  - :white_square_button: comptoir
+  - :white_square_button: ignore_creator
+  - :white_square_button: offer
+  - :white_square_button: sell_order
+
+:white_check_mark: Updating comptoirjs
+  - :white_check_mark: example work flow
+  - :white_check_mark: utils function
+  - :white_check_mark: program call function
+
+:white_square_button: ...
