@@ -1,12 +1,11 @@
 import * as anchor from '@project-serum/anchor'
 import { Comptoir } from '../comptoir'
 import { PublicKey } from '@solana/web3.js'
-import { getAssociatedTokenAddress, getCollectionPDA, getComptoirPDA, getMasterEditionPDA, getMetadataPDA, getSellOrderPDA } from '../getPDAs'
-import { loadKeypairFromFile, nft_data } from '../../utils/helper'
-import { mintNFT } from '../../utils/utils'
+import { getAssociatedTokenAddress, getCollectionPDA, getComptoirPDA, getSellOrderPDA } from '../getPDAs'
 import * as splToken from '@solana/spl-token'
 import { Collection } from '../collection'
-import { WrapperConnection } from '../../utils/wrapperConnection'
+import { mintNFT, loadKeypairFromFile, nft_data } from './utils/helper'
+import { WrapperConnection } from './utils/WrapperConnection'
 
 const connection = new WrapperConnection("https://api.devnet.solana.com", 'finalized');
 const payer = loadKeypairFromFile("/home/daniel/.config/solana/id.json")

@@ -1,13 +1,48 @@
-import { createAccount, createMint, mintTo, TOKEN_PROGRAM_ID } from "@solana/spl-token";
-import { Connection, Keypair, sendAndConfirmTransaction, Transaction } from '@solana/web3.js';
-import {
-  CreateMetadataAccountArgsV3,
-  createCreateMetadataAccountV3Instruction,
-  createCreateMasterEditionV3Instruction,
-  createSetCollectionSizeInstruction,
-} from "@metaplex-foundation/mpl-token-metadata";
-import { explorerURL, extractSignatureFromFailedTransaction } from "./helper";
-import { getMasterEditionPDA, getMetadataPDA } from "../comptoirjs";
+import { PublicKey } from '@metaplex-foundation/js';
+import { CreateMetadataAccountArgsV3, createCreateMasterEditionV3Instruction, createCreateMetadataAccountV3Instruction, createSetCollectionSizeInstruction } from '@metaplex-foundation/mpl-token-metadata';
+import { TOKEN_PROGRAM_ID, createAccount, createMint, mintTo } from '@solana/spl-token';
+import { Connection, Keypair, Transaction, sendAndConfirmTransaction } from '@solana/web3.js';
+import fs from 'fs'
+import { getMasterEditionPDA, getMetadataPDA } from '../../getPDAs';
+
+/*
+  Load a locally stored JSON keypair file and convert it to a valid Keypair
+*/
+export function loadKeypairFromFile(absPath: string) {
+  try {
+    if (!absPath) throw Error("No path provided");
+    if (!fs.existsSync(absPath)) throw Error("File does not exist.");
+
+    // load the keypair from the file
+    const keyfileBytes = JSON.parse(fs.readFileSync(absPath, { encoding: "utf-8" }));
+    // parse the loaded secretKey into a valid keypair
+    const keypair = Keypair.fromSecretKey(new Uint8Array(keyfileBytes));
+    return keypair;
+  } catch (err) {
+    // return false;
+    throw err;
+  }
+}
+
+export const nft_data = (creator: PublicKey): CreateMetadataAccountArgsV3 => ({
+  data: {
+    name: 'Helios 3D',
+    symbol: 'AURY',
+    uri: 'https://arweave.net/uKoxW5gu2A7Wem-tgyWZ9-T46aAg49Gac-n0GNibTjI',
+    sellerFeeBasisPoints: 100,
+    creators: [
+      {
+        address: creator,
+        verified: true,
+        share: 100,
+      },
+    ],
+    collection: null,
+    uses: null,
+  },
+  isMutable: false,
+  collectionDetails: null,
+});
 
 /**
  * Create an NFT collection on-chain, using the regular Metaplex standards
@@ -57,8 +92,8 @@ export async function mintNFT(
     undefined,
     TOKEN_PROGRAM_ID,
   );
-  console.log(explorerURL({ txSignature: mintSig }));
-
+  console.log('min Token transaction signature', mintSig);
+  
   // derive the PDA for the metadata account
   const metadataAccount = getMetadataPDA(mint);
   console.log("Metadata account:", metadataAccount.toBase58());
@@ -125,12 +160,9 @@ export async function mintNFT(
     });
 
     console.log("\nCollection successfully created!");
-    console.log(explorerURL({ txSignature }));
+    console.log('mint NFT transaction signature', txSignature);
   } catch (err) {
     console.error("\nFailed to create collection:", err);
-
-    // log a block explorer link for the failed transaction
-    await extractSignatureFromFailedTransaction(connection, err);
 
     throw err;
   }
