@@ -3,10 +3,10 @@ seeds = false
 skip-lint = false
 
 [programs.localnet]
-comptoir = "BDrVozxqgonijgLa7CWAv3cRT4gN577WJppa65PWeYJo"
+comptoir = "FY4tLSXn95o5YuecY3sAfPCoPk9ZSs2cvFa9HiHYPFgy"
 
 [programs.devnet]
-comptoir = "BDrVozxqgonijgLa7CWAv3cRT4gN577WJppa65PWeYJo"
+comptoir = "FY4tLSXn95o5YuecY3sAfPCoPk9ZSs2cvFa9HiHYPFgy"
 
 [registry]
 # url = "https://anchor.projectserum.com"
@@ -20,8 +20,8 @@ wallet = "/home/daniel/.config/solana/id.json"
 [scripts]
 test = "yarn run ts-mocha -t 1000000 tests/**/*.ts"
 client = "yarn run ts-node client/*.ts"
-example-wf = "yarn run ts-node packages/comptoirjs/examples/complete_workflow.ts"
+example-wf = "yarn run ts-node comptoirjs/examples/complete_workflow.ts"
 
 [[test.genesis]]
-address = "BDrVozxqgonijgLa7CWAv3cRT4gN577WJppa65PWeYJo"
+address = "FY4tLSXn95o5YuecY3sAfPCoPk9ZSs2cvFa9HiHYPFgy"
 program = "./deps/metadata.so"

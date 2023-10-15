@@ -8,7 +8,7 @@ import {
   createSetCollectionSizeInstruction,
 } from "@metaplex-foundation/mpl-token-metadata";
 import { explorerURL, extractSignatureFromFailedTransaction } from "./helper";
-import { getMasterEditionPDA, getMetadataPDA } from "../packages/comptoirjs";
+import { getMasterEditionPDA, getMetadataPDA } from "../comptoirjs";
 
 /**
  * Create an NFT collection on-chain, using the regular Metaplex standards

@@ -59,7 +59,7 @@ export class Comptoir {
     if (!this.comptoirPDA) {
       throw new Error('comptoirPDA is not set');
     }
-    let collectionPDA = getCollectionPDA(
+    const collectionPDA = getCollectionPDA(
       this.comptoirPDA,
         name,
         this.programID

@@ -125,7 +125,7 @@ export const nft_data = (creator: PublicKey): CreateMetadataAccountArgsV3 => ({
     creators: [
       {
         address: creator,
-        verified: false,
+        verified: true,
         share: 100,
       },
     ],
