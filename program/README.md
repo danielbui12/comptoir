@@ -25,6 +25,20 @@ We are planing to add a lot of features to Comptoir outside standard buying and 
 The first one is the Buy Offer. If an item is not listed in the marketplace then one can create an offer for it.
 Any seller owning that asset can then at any time accept the offer thus transferring the asset to the creator of the offer and receiving the funds.
 
+### Requirement
+
+- solana v1.14.18
+- node >=v16 <=v18
+- Run test 
+```sh
+$ solana-test-validator --bpf-program TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA token_metadata_program.so --bpf-program ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL associated_token_metadata_program.so --bpf-program metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s metaplex_token_metadata_program.so --reset
+
+$ anchor test --skip-local-validator
+```
+
 ## Gitbook
 
 To understand the key concepts and get started creating your own marketplace check out the gitbook [here](https://aurory.gitbook.io/comptoir/)
+
+
+https://solana.stackexchange.com/a/1885

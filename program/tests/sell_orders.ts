@@ -12,7 +12,7 @@ import {
 import assert from "assert";
 import { nft_data } from "../utils/helper";
 import { mintNFT } from "../utils/utils";
-import { Comptoir, Collection, getSellOrderPDA, getCollectionPDA, getNftVaultPDA } from "../packages/comptoirjs";
+import { Comptoir, Collection, getSellOrderPDA, getCollectionPDA, getNftVaultPDA } from "../comptoirjs";
 import { confirmTx } from "../utils/helper";
 
 const provider = anchor.getProvider()
@@ -55,15 +55,15 @@ describe('multi sell orders test', () => {
       6
     );
 
-    creatorTokenAccount = await getOrCreateAssociatedTokenAccount(
-      provider.connection, creator, comptoirMint, creator.publicKey
-		);
-    console.log('creatorTokenAccount', creatorTokenAccount.address);
+    // creatorTokenAccount = await getOrCreateAssociatedTokenAccount(
+    //   provider.connection, creator, comptoirMint, creator.publicKey
+		// );
+    // console.log('creatorTokenAccount', creatorTokenAccount.address);
 
-    sellerTokenAccount = await getOrCreateAssociatedTokenAccount(
-      provider.connection, seller, comptoirMint, seller.publicKey,
-		);
-    console.log('sellerTokenAccount', sellerTokenAccount.address);
+    // sellerTokenAccount = await getOrCreateAssociatedTokenAccount(
+    //   provider.connection, seller, comptoirMint, seller.publicKey,
+		// );
+    // console.log('sellerTokenAccount', sellerTokenAccount.address);
 
 		const metadata = nft_data(creator.publicKey);
     const { mint, tokenAccount, metadataAccount, masterEditionAccount } = await mintNFT(

@@ -9,19 +9,14 @@ comptoir = "FY4tLSXn95o5YuecY3sAfPCoPk9ZSs2cvFa9HiHYPFgy"
 comptoir = "FY4tLSXn95o5YuecY3sAfPCoPk9ZSs2cvFa9HiHYPFgy"
 
 [registry]
-# url = "https://anchor.projectserum.com"
-url = "http://127.0.0.1:8899"
+url = "https://anchor.projectserum.com"
 
 [provider]
-# cluster = "localnet"
-cluster = "devnet"
+cluster = "localnet"
+# cluster = "devnet"
 wallet = "/home/daniel/.config/solana/id.json"
 
 [scripts]
 test = "yarn run ts-mocha -t 1000000 tests/**/*.ts"
 client = "yarn run ts-node client/*.ts"
 example-wf = "yarn run ts-node comptoirjs/examples/complete_workflow.ts"
-
-[[test.genesis]]
-address = "FY4tLSXn95o5YuecY3sAfPCoPk9ZSs2cvFa9HiHYPFgy"
-program = "./deps/metadata.so"
