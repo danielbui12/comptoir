@@ -2,11 +2,9 @@ import "mocha";
 import * as anchor from '@project-serum/anchor';
 import { web3 } from '@project-serum/anchor';
 import * as splToken from '@solana/spl-token';
-import { PublicKey } from "@solana/web3.js";
 import assert from "assert";
 import { confirmTx, nft_data } from "../utils/helper";
-import { mintNFT } from "../utils/utils";
-import { Collection, Comptoir, getCollectionPDA, getComptoirPDA, getEscrowPDA } from "../comptoirjs";
+import { Comptoir, getCollectionPDA, getComptoirPDA } from "../comptoirjs";
 
 let provider = anchor.getProvider()
 anchor.setProvider(provider);
@@ -15,19 +13,11 @@ describe('comptoir with mint', () => {
   let admin: web3.Keypair;
   let adminTokenAccount: web3.PublicKey;
   let creator: web3.Keypair;
-  let creatorTokenAccount: web3.PublicKey;
   let seller: web3.Keypair;
-  let sellerTokenAccount: web3.PublicKey;
-  let sellerNftTokenAccount: PublicKey;
+  let collectionPDA: web3.PublicKey;
   let comptoirMint: web3.PublicKey;
   let comptoir: Comptoir;
-  let collection: Collection;
   let collectionFee = 500;
-  let nftMint: web3.PublicKey;
-  let metadataPDA: PublicKey;
-  let programNftVaultPDA: PublicKey;
-  let sellOrderPDA: PublicKey;
-  let escrowPDA: PublicKey;
 
   const fee = 200;
   const collectionName = "aurorian"
@@ -69,50 +59,12 @@ describe('comptoir with mint', () => {
     );
 
     /////////////// INIT PDA //////////////////
-    creatorTokenAccount = (await splToken.getOrCreateAssociatedTokenAccount(
-      provider.connection,
-      creator,
-      comptoirMint,
-      creator.publicKey,
-    )).address;
-
-    sellerTokenAccount = (await splToken.getOrCreateAssociatedTokenAccount(
-      provider.connection,
-      seller,
-      comptoirMint,
-      seller.publicKey,
-    )).address;
-
     adminTokenAccount = (await splToken.getOrCreateAssociatedTokenAccount(
       provider.connection,
       admin,
       comptoirMint,
       admin.publicKey,
     )).address;
-
-    /////////////// MINT NFT //////////////////
-    const metadata = nft_data(creator.publicKey);
-    const { mint } = await mintNFT(
-      provider.connection,
-      creator,
-      metadata,
-    );
-    nftMint = mint
-
-    /////////////// INIT PDA //////////////////
-    sellerNftTokenAccount = (await splToken.getOrCreateAssociatedTokenAccount(
-      provider.connection,
-      seller,
-      nftMint,
-      seller.publicKey
-    )).address
-    // const ata = await splToken.getOrCreateAssociatedTokenAccount(
-    //   provider.connection,
-    //   buyer,
-    //   comptoirMint,
-    //   buyer.publicKey,
-    // )
-    // await splToken.mintTo(provider.connection, buyer, comptoirMint, ata.address, admin, price)
   });
 
   it('create comptoir', async () => {
@@ -188,20 +140,21 @@ describe('comptoir with mint', () => {
   });
 
   it('create collection', async () => {
-    // await comptoir.createCollection(
-    //   creator,
-    //   collectionName,
-    //   creator.publicKey,
-    //   collectionSymbol,
-    //   false,
-    //   collectionFee
-    // )
-    // const collectionPDA = getCollectionPDA(comptoir.comptoirPDA, collectionName)
-    // const createdCollection = await comptoir.program.account.collection.fetch(collectionPDA)
-    // assert.equal(createdCollection.comptoirKey.toString(), comptoir.comptoirPDA.toString());
-    // assert.equal(createdCollection.requiredVerifier.toString(), creator.publicKey.toString());
-    // assert.equal(createdCollection.symbol.toString(), collectionName);
-    // assert.equal(createdCollection.fees.toString(), collectionFee.toString());
+    await comptoir.createCollection(
+      admin,
+      collectionName,
+      creator.publicKey,
+      collectionSymbol,
+      false,
+      collectionFee
+    )
+    collectionPDA = getCollectionPDA(comptoir.comptoirPDA, collectionName)
+    const createdCollection = await comptoir.program.account.collection.fetch(collectionPDA)
+    assert.equal(createdCollection.comptoirKey.toString(), comptoir.comptoirPDA.toString());
+    assert.equal(createdCollection.requiredVerifier.toString(), creator.publicKey.toString());
+    assert.equal(createdCollection.symbol.toString(), collectionSymbol);
+    assert.equal(createdCollection.name.toString(), collectionName);
+    assert.equal(createdCollection.fees.toString(), collectionFee.toString());
   });
 
   it('fail: create collection fee > 10000', async () => {
@@ -217,29 +170,29 @@ describe('comptoir with mint', () => {
     );
   });
 
-  // it('update collection', async () => {
-  //   let tmpFee = 12
-  //   let tmpName = "some name"
-  //   let tmpRequiredVerifier = anchor.web3.Keypair.generate().publicKey
+  it('update collection', async () => {
+    let tmpFee = 12
+    let tmpName = "some name"
+    let tmpRequiredVerifier = anchor.web3.Keypair.generate().publicKey
 
-  //   await program.methods.updateCollection(tmpFee, tmpName, tmpRequiredVerifier, false).accounts({
-  //     authority: admin.publicKey,
-  //     comptoir: comptoirPDA,
-  //     collection: collectionPDA,
-  //   }).signers([admin]).rpc()
+    await comptoir.program.methods.updateCollection(tmpFee, tmpName, tmpRequiredVerifier, false).accounts({
+      authority: admin.publicKey,
+      comptoir: comptoir.comptoirPDA,
+      collection: collectionPDA,
+    }).signers([admin]).rpc()
 
-  //   let updatedCollection = await program.account.collection.fetch(collectionPDA)
-  //   assert.equal(updatedCollection.requiredVerifier.toString(), tmpRequiredVerifier.toString());
-  //   assert.equal(updatedCollection.symbol.toString(), tmpName);
-  //   assert.equal(updatedCollection.fees.toString(), tmpFee.toString());
-  //   assert.equal(updatedCollection.ignoreCreatorFee, false);
+    let updatedCollection = await comptoir.program.account.collection.fetch(collectionPDA)
+    assert.equal(updatedCollection.requiredVerifier.toString(), tmpRequiredVerifier.toString());
+    assert.equal(updatedCollection.symbol.toString(), tmpName);
+    assert.equal(updatedCollection.fees.toString(), tmpFee.toString());
+    assert.equal(updatedCollection.ignoreCreatorFee, false);
 
-  //   // reset
-  //   await program.methods.updateCollection(collectionFee, collectionName, creator.publicKey, false).accounts({
-  //     authority: admin.publicKey,
-  //     comptoir: comptoirPDA,
-  //     collection: collectionPDA,
-  //   },
-  //   ).signers([admin]).rpc()
-  // });
+    // reset
+    await comptoir.program.methods.updateCollection(collectionFee, collectionName, creator.publicKey, false).accounts({
+      authority: admin.publicKey,
+      comptoir: comptoir.comptoirPDA,
+      collection: collectionPDA,
+    },
+    ).signers([admin]).rpc()
+  });
 });
