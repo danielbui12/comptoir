@@ -30,8 +30,7 @@ export class Comptoir {
   ): Promise<string> {
     const comptoirPDA = getComptoirPDA(owner.publicKey, this.programID);
     const escrowPDA = getEscrowPDA(comptoirPDA, mint, this.programID);
-
-    this.comptoirPDA = comptoirPDA;
+    const comptoirThat = this;
 
     return await this.program.methods
       .createComptoir(mint, fees, feesDestination, owner.publicKey)
@@ -45,7 +44,11 @@ export class Comptoir {
         rent: SYSVAR_RENT_PUBKEY,
       })
       .signers([owner])
-      .rpc();
+      .rpc()
+      .then((res) => {
+        comptoirThat.comptoirPDA = comptoirPDA;
+        return res
+      });
   }
 
   async createCollection(
@@ -59,6 +62,8 @@ export class Comptoir {
     if (!this.comptoirPDA) {
       throw new Error('comptoirPDA is not set');
     }
+    console.log('this.comptoirPDA', this.comptoirPDA);
+    
     const collectionPDA = getCollectionPDA(
       this.comptoirPDA,
         name,
