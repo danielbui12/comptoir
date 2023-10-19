@@ -42,6 +42,15 @@ $ anchor test
 
 ### 2. Testing with separated local validator
 
+- Compiling:
+```sh
+$ anchor build
+
+$ anchor keys list
+# The new contract address will appear in terminal console. Please replace all contract address by the new one.
+```
+
+
 - Because Token, Associated Token, Metaplex are not available in localhost, so we've to clone it. [Following this answer](https://solana.stackexchange.com/a/1885)
 
 ```sh
