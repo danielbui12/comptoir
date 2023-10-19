@@ -16,7 +16,7 @@ import { confirmTx } from "../utils/helper";
 const provider = anchor.getProvider()
 anchor.setProvider(provider);
 
-describe('multi sell orders test', () => {
+describe('sell orders test', () => {
 	let creator: web3.Keypair;
 	let seller: web3.Keypair;
   let sellerNftAccount: web3.PublicKey;
@@ -144,7 +144,7 @@ describe('multi sell orders test', () => {
 			buyerTokenATA.address,
       sellQuantity,
 			buyer,
-		).catch(console.log)
+		)
     console.log('Bought asset')
 
 		const buyerNftAccountAfterSell = await getAccount(provider.connection, buyerNftATA.address)
