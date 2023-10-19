@@ -116,7 +116,7 @@ export function loadKeypairFromFile(absPath: string) {
   }
 }
 
-export const nft_data = (creator: PublicKey): CreateMetadataAccountArgsV3 => ({
+export const nft_data = (creator: PublicKey, extraCreator: CreateMetadataAccountArgsV3['data']['creators'] = []): CreateMetadataAccountArgsV3 => ({
   data: {
     name: 'Helios 3D',
     symbol: 'AURY',
@@ -128,6 +128,7 @@ export const nft_data = (creator: PublicKey): CreateMetadataAccountArgsV3 => ({
         verified: true,
         share: 100,
       },
+      ...extraCreator,
     ],
     collection: null,
     uses: null,
