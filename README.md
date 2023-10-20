@@ -15,7 +15,7 @@
   - :white_check_mark: utils function
   - :white_check_mark: program call function
 
-:white_square_button: Update SDK
-  - :white_square_button: add update method: update comptoir, update collection
+:white_check_mark: Update SDK
+  - :white_check_mark: add update method: update comptoir, update collection
 
 :white_square_button: ...
