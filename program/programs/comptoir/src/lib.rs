@@ -666,7 +666,7 @@ pub struct UpdateComptoirMint<'info> {
     #[account(mut, has_one = authority)]
     comptoir: Account<'info, Comptoir>,
 
-    #[account(constraint = new_comptoir_mint == mint.key())]
+    #[account(constraint = new_comptoir_mint != mint.key())]
     mint: Account<'info, Mint>,
 
     #[account(
