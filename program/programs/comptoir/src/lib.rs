@@ -398,12 +398,9 @@ pub mod comptoir {
         }
 
         let mut comptoir_fee = ctx.accounts.comptoir.fees;
-        msg!("lulz");
         if let Some(collection_share) = ctx.accounts.collection.fees {
-            msg!("lalla");
             comptoir_fee = collection_share;
         }
-        msg!(comptoir_fee.to_string().as_str());
         let total_amount = ctx.accounts.buy_offer.proposed_price;
         let mut creators_share = 0;
         if !ctx.accounts.collection.ignore_creator_fee {
@@ -433,8 +430,6 @@ pub mod comptoir {
                 )?;
             }
         }
-
-        msg!(comptoir_share.to_string().as_str());
 
         pay_with_signer(
             ctx.accounts.escrow.to_account_info(),
@@ -666,7 +661,7 @@ pub struct UpdateComptoirMint<'info> {
     #[account(mut, has_one = authority)]
     comptoir: Account<'info, Comptoir>,
 
-    #[account(constraint = new_comptoir_mint == mint.key())]
+    #[account(constraint = new_comptoir_mint != mint.key())]
     mint: Account<'info, Mint>,
 
     #[account(

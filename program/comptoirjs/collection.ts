@@ -24,6 +24,8 @@ export class Collection {
   collectionPDA: PublicKey;
   comptoir: Comptoir;
   provider: anchor.Provider;
+  cacheTime = 60 * 1000 // 60 seconds
+  checkPoint = new Date().getTime()
 
   private collectionCache?: IdlAccounts<ComptoirDefinition>['collection'];
 
@@ -331,7 +333,7 @@ export class Collection {
     if (!this.comptoir.comptoirPDA) {
       throw new Error('comptoirPDA is not set');
     }
-    let escrowPDA = await getEscrowPDA(
+    const escrowPDA = getEscrowPDA(
       this.comptoir.comptoirPDA,
       (
         await this.comptoir.getComptoir()
@@ -446,15 +448,19 @@ export class Collection {
     return this._sendInstruction(ix, [seller]);
   }
 
-  async getCollection(): Promise<
+  async getCollection(refreshCache = false): Promise<
     IdlAccounts<ComptoirDefinition>['collection']
   > {
-    if (this.collectionCache) {
+    if (refreshCache) {
+      this.checkPoint = new Date().getTime();
+    }
+    if (new Date().getTime() - this.checkPoint >= this.cacheTime && this.collectionCache) {
       return this.collectionCache;
     }
     this.collectionCache = await this.program.account.collection.fetch(
       this.collectionPDA
     );
+    this.checkPoint = new Date().getTime();
     return this.collectionCache;
   }
 
@@ -487,5 +493,44 @@ export class Collection {
       }
     }
     return creatorsAccounts;
+  }
+
+  async updateCollectionInstruction(
+    collectionFee: number,
+    collectionName: string,
+    requiredVerifier: PublicKey,
+    ignoreCreatorFee: boolean,
+    adminPubKey: PublicKey,
+  ): Promise<TransactionInstruction> {
+    if (!this.comptoir.comptoirPDA) {
+      throw new Error('comptoirPDA is not set');
+    }
+
+    return await this.program.methods
+      .updateCollection(collectionFee, collectionName, requiredVerifier, ignoreCreatorFee)
+      .accounts({
+        authority: adminPubKey,
+        comptoir: this.comptoir.comptoirPDA,
+        collection: this.collectionPDA,
+      })
+      .instruction()
+  }
+
+  async updateCollection(
+    collectionFee: number, 
+    collectionName: string,
+    requiredVerifier: PublicKey,
+    ignoreCreatorFee: boolean,
+    adminPubKey: PublicKey,
+    owner: Keypair
+  ): Promise<string> {
+    let ix = await this.updateCollectionInstruction(
+      collectionFee,
+      collectionName,
+      requiredVerifier,
+      ignoreCreatorFee,
+      adminPubKey,
+    );
+    return this._sendInstruction(ix, [owner]);
   }
 }

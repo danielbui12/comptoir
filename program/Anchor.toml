@@ -17,7 +17,7 @@ cluster = "localnet"
 wallet = "/home/daniel/.config/solana/id.json"
 
 [scripts]
-test = "yarn run ts-mocha -t 1000000 tests/comptoir.ts"
+test = "yarn run ts-mocha -t 1000000 tests/**/*.ts"
 client = "yarn run ts-node client/*.ts"
 example-wf = "yarn run ts-node comptoirjs/examples/complete_workflow.ts"
 

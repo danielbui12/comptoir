@@ -11,6 +11,8 @@ export class Comptoir {
   program: anchor.Program<ComptoirDefinition>;
   comptoirPDA: PublicKey | null;
   programID: PublicKey;
+  cacheTime = 60 * 1000 // 60 seconds
+  checkPoint = new Date().getTime()
 
   private comptoirCache?: IdlAccounts<ComptoirDefinition>['comptoir'];
 
@@ -62,7 +64,6 @@ export class Comptoir {
     if (!this.comptoirPDA) {
       throw new Error('comptoirPDA is not set');
     }
-    console.log('this.comptoirPDA', this.comptoirPDA);
     
     const collectionPDA = getCollectionPDA(
       this.comptoirPDA,
@@ -89,16 +90,58 @@ export class Comptoir {
       .rpc();
   }
 
-  async getComptoir(): Promise<IdlAccounts<ComptoirDefinition>['comptoir']> {
-    if (this.comptoirCache) {
-      return this.comptoirCache;
+  async getComptoir(refreshCache = false): Promise<IdlAccounts<ComptoirDefinition>['comptoir']> {
+    if (refreshCache) {
+      this.checkPoint = new Date().getTime();
     }
+    if (new Date().getTime() - this.checkPoint >= this.cacheTime && this.comptoirCache) {
+      return this.comptoirCache;
+    }    
     if (!this.comptoirPDA) {
       throw new Error('comptoirPDA is not set');
     }
     this.comptoirCache = await this.program.account.comptoir.fetch(
       this.comptoirPDA
     );
+    this.checkPoint = new Date().getTime();
     return this.comptoirCache;
+  }
+
+  async updateComptoir(fee: number, comptoirMint: PublicKey, admin: PublicKey, oldAdmin: Keypair): Promise<string> {
+    return await this.program.methods
+      .updateComptoir(fee, comptoirMint, admin)
+      .accounts({
+        authority: oldAdmin.publicKey,
+        comptoir: this.comptoirPDA as PublicKey,
+      })
+      .signers([oldAdmin])
+      .rpc();
+  }
+
+  async updateComptoirMint(
+    comptoirMint: PublicKey,
+    tokenAccount: PublicKey,
+    oldMint: PublicKey,
+    admin: Keypair
+  ): Promise<string> {
+    if (!this.comptoirPDA) {
+      throw new Error('comptoirPDA is not set');
+    }
+    
+    const escrowPDA = getEscrowPDA(this.comptoirPDA, comptoirMint, this.programID);    
+    return await this.program.methods
+      .updateComptoirMint(comptoirMint, tokenAccount)
+      .accounts({
+        authority: admin.publicKey,
+        comptoir: this.comptoirPDA,
+        mint: oldMint,
+        escrow: escrowPDA,
+        systemProgram: anchor.web3.SystemProgram.programId,
+        tokenProgram: TOKEN_PROGRAM_ID,
+        rent: anchor.web3.SYSVAR_RENT_PUBKEY,
+      })
+      .signers([admin])
+      .rpc()
+
   }
 }
